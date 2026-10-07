@@ -1,8 +1,9 @@
-# Lesotho points of interest: data pipeline
+# Lesotho points of interest: data pipeline and GNN model
 
 This folder holds the OpenStreetMap points of interest (POIs) for Lesotho and the files derived from them for the
-GNN (graph neural network) business-location study. Every derived file comes from the one OSM export; no outside
-data are added at any stage. Terms, codes, categories and every column are explained in the [Dictionary](#dictionary)
+GNN (graph neural network) business-location study, the GNN itself, and a command-line tool that applies it. Every
+derived file comes from the one OSM export; no outside data are added at any stage. How the model is evaluated is in
+[Stage 5.3](#53-metrics). Terms, codes, categories and every column are explained in the [Dictionary](#dictionary)
 at the end.
 
 ```
@@ -16,10 +17,10 @@ processed_poi.csv              6,083 nodes x 43 columns
         │  Stage 3: poi_feature_engineering.ipynb (model-ready features)
         ▼
 poi_engineered.csv             6,083 nodes x 92 columns (66 model features)
-        │  gnn_location_model.ipynb (dual-mode GraphSAGE, ablations, RO2/RO3 analyses)
-        ▼
+        │  Stage 5: gnn_location_model.ipynb (dual-mode GraphSAGE, evaluation, ablations, RO2/RO3)
+        ▼                (Stage 4, model.ipynb, was the first design and is kept for the record)
 model_outputs_v2/              25 trained models, predictions in both modes, market gaps, metrics
-        │  predict_poi.py (score a candidate site, suggest sites, market gaps)
+        │  Stage 6: predict_poi.py (score a candidate site, suggest sites, market gaps)
 ```
 
 ## Files
@@ -228,21 +229,271 @@ Results should be reported with and without the three columns whose names contai
 
 ---
 
+## Stage 4: model iteration 1 (`model.ipynb` → `model_outputs/`)
+
+The first model was a GraphSAGE network (with a separate weight for the node itself, residual layers and jumping
+knowledge; GAT was tested and lost) trained on all 66 features, with the label trick and validation-fitted class
+offsets. Under the spatial CV of Stage 2.5 it reached **test macro-F1 0.375 ± 0.021**, three times chance.
+
+Its ablations showed where that score came from. Without the 8 `attr_` features it lost 0.051, and **geography alone
+(`loc_` + `adm_` + `struct_`) reached only 0.235**. The model classified POIs mostly by how volunteers had mapped them
+(named or not, outline or point, address, opening hours). Those attributes do not exist for an empty candidate site,
+so this model could not score a location where no business stands yet, which is what the study's aim (market gaps,
+suitable areas) needs. In design-science terms, its evaluation fed back into a second design (Stage 5). The notebook
+and its outputs are kept unchanged as the record of that first cycle; nothing else uses them.
+
+---
+
+## Stage 5: the dual-mode GNN (`gnn_location_model.ipynb` → `model_outputs_v2/`)
+
+### 5.1 Design: one model, two input modes
+
+| Mode | The node's own mapping attributes | Used for |
+|---|---|---|
+| **Known POI mode** | visible | classifying a mapped POI (RO1, RO4) |
+| **Site mode** | hidden, and a flag `own_attrs_hidden` set to 1 | what a location and its neighbourhood imply, e.g. for a candidate site (RO2, RO3, RO4) |
+
+The same weights serve both modes. The **own-node columns** hidden in site mode are the 8 `attr_` features plus
+`ctx_osm_id_rank_vs_k32` and `ctx_footprint_vs_k32`, which compare the node with its neighbours. The other `ctx_`
+features describe the 32 nearest *other* nodes, so they exist for a candidate site too. A hidden column is set to 0
+(the training mean of a standardised column), and the flag tells the model "hidden" apart from "absent".
+
+**Architecture.** A linear encoder takes the node's 66 features, the flag and its visible category (one-hot, zeros
+if hidden). It is followed by 2 residual GraphSAGE layers with batch norm, ReLU and dropout, and a classifier on the
+concatenation of all layers (jumping knowledge). The GraphSAGE layer averages the neighbours with **distance
+weights** (a softmax of −distance / 250 m over each node's incoming edges, so a shop 50 m away counts more than a
+village 4 km away) and keeps a separate weight for the node itself.
+
+**One training epoch.**
+
+1. The training nodes are shuffled. A share *r*, drawn uniformly from 0.1 to 0.9 each epoch, shows its category as
+   an input (the **label trick**); the loss is taken on the other nodes, so a node never sees its own answer.
+2. Of those loss nodes, 30% (the **mask rate**) are put in site mode.
+3. Loss: cross-entropy with class weights `(n / (8 n_c)) ** 0.75` and label smoothing 0.05; AdamW (learning rate
+   0.01, weight decay 0.05), full batch, dropout 0.5, hidden width 128.
+4. **Early stopping** on the mean of the known-mode and site-mode validation macro-F1 (patience 50, at most 300
+   epochs); the best epoch's weights are kept.
+
+**After training**, two more steps are applied:
+- **Label reuse:** confident predictions (softmax ≥ τ) of the nodes outside the training folds are fed back in as
+  visible categories and the model runs again. It was selected on validation (1 round, τ = 0.5) but changes test F1
+  by less than 0.004.
+- **Temperature scaling:** one temperature per model and mode, fitted on the validation fold, divides the logits so
+  that the probabilities match observed frequencies.
+
+### 5.2 Evaluation protocol
+
+- **Spatial 5-fold CV** on the 5 km blocks of Stage 2.5. Split *f* tests on fold *f*, validates on fold
+  (*f* + 1) mod 5 and trains on the other three. Only training-fold categories are ever visible as inputs. The 131
+  unlabelled nodes stay in the graph as neighbours.
+- **Every choice is made on validation:** the architecture, the hyperparameters, the label-reuse setting and the
+  temperatures. The test folds play no part in any choice.
+- **Final model:** 5 seeds per split, 25 models in total. Each test fold is predicted by the mean of its 5 models'
+  temperature-scaled probabilities, so every labelled node gets one **out-of-fold** prediction from models that never
+  trained on its area.
+- **Evaluation in both modes.** The nodes outside the training folds are split into 10 random groups. Each group is
+  predicted with the other groups present as neighbours. In site mode the group's own attributes are hidden, so a node's
+  attributes are not present anywhere in the graph when it is scored.
+- **Chance level:** guessing at the class frequencies gives an expected macro-F1 of 0.125, because each class's F1
+  equals its share and the 8 shares average to 1/8.
+
+### 5.3 Metrics
+
+| Metric | Definition | Why it is used | Where |
+|---|---|---|---|
+| **Macro-F1** (main metric) | F1 = 2·precision·recall / (precision + recall), computed per category and averaged with equal weight | The classes are unbalanced (Infrastructure is 9 times Healthcare); accuracy would reward ignoring the small classes. Chapter 1 specifies it | Selection (validation), headline result (test), ablations |
+| **Precision, recall, F1 per category** | Precision: share of the nodes predicted as *c* that are *c*. Recall: share of the *c* nodes predicted as *c* | Shows which categories the model can and cannot recognise; chapter 1 asks for per-class recall | Results (5.5) |
+| **Accuracy** | Share of nodes given the right category | Familiar summary; reported next to macro-F1, never instead of it | Results |
+| **Top-2 / top-3 accuracy** | Share of nodes whose true category is among the model's 2 or 3 most likely | The tool gives a ranked shortlist, so a correct second or third choice is still useful | Results, per category |
+| **Log loss** | Mean of −ln(probability given to the true category) | Measures the quality of the whole probability vector, not just the top class. Far less noisy than macro-F1 | Temperature fitting, permutation importance (RO2) |
+| **Expected calibration error (ECE)** | Nodes are binned by their top probability (15 bins). ECE is the weighted mean gap between each bin's average probability and its accuracy | RO3 sums probabilities into expected counts, which is only valid if they are calibrated | Results, RO3 |
+| **Fold SD** | Standard deviation of the 5 held-out folds' scores | Shows how much performance varies between areas; differences smaller than about one SD are treated as noise | Every table |
+| **Pooled score** | The metric over all 5,952 out-of-fold predictions at once | One number per category without averaging over folds | Results |
+| **Validation score** | Mean of known-mode and site-mode validation macro-F1 | One criterion that values both modes equally | Architecture and tuning selection |
+| **z-score of a market gap** | (expected − observed) / √Σ p(1 − p) per sub-district and category | A significance test of a gap. It relies on the calibration measured by ECE; it is not a performance metric | RO3 (5.8) |
+
+The second half of RO4, how useful business owners find the recommendations, is measured by interviews, not here.
+
+### 5.4 Selection and tuning
+
+| Step | Result |
+|---|---|
+| **Layer type** (same settings, 3 seeds) | GraphSAGE validation score 0.315, GAT 0.313, GCN 0.312: tied. **GraphSAGE** was kept (best on validation, 4 times faster than GAT) |
+| **Tuning** (12 random configurations + the start, 3 seeds each) | Validation scores 0.306 to 0.320; the top eight lie within 0.008. Selected: hidden 128, 2 layers, dropout 0.5, class-weight power 0.75, mask rate 0.3, label rate 0.1 to 0.9, distance scale 250 m. **The margin over the starting configuration (0.005) is within noise**: the limit is the information in the data, not the settings. The one clear effect is the mask rate, which trades the two modes against each other |
+
+### 5.5 Results (final 25-model ensemble, test folds)
+
+| | Known mode | Site mode |
+|---|---|---|
+| **Macro-F1, mean ± SD over 5 folds** | **0.356 ± 0.039** | **0.245 ± 0.036** |
+| Macro-F1, pooled | 0.360 | 0.255 |
+| Accuracy | 0.552 | 0.388 |
+| Top-2 / top-3 accuracy | 0.715 / 0.826 | 0.597 / 0.718 |
+| ECE before / after temperature scaling | 0.038 / 0.038 | 0.032 / 0.036 |
+| Log loss before / after | 1.335 / 1.315 | 1.765 / 1.739 |
+| Median temperature | 0.87 | 0.97 |
+
+Per held-out fold (macro-F1, known / site): fold 0 0.388 / 0.261, fold 1 0.360 / 0.251, fold 2 0.372 / 0.255,
+fold 3 0.383 / 0.282, **fold 4 (Maseru) 0.280 / 0.176**, the weakest in both modes.
+
+Per category (out-of-fold, all 5,952 labelled nodes):
+
+| Category | Support | Known: precision | recall | F1 | top-3 | Site: precision | recall | F1 | top-3 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Infrastructure | 1,792 | 0.740 | 0.679 | 0.708 | 0.869 | 0.515 | 0.360 | 0.424 | 0.741 |
+| Educational | 1,666 | 0.852 | 0.843 | **0.847** | 0.923 | 0.620 | 0.606 | **0.613** | 0.806 |
+| Retail | 1,181 | 0.477 | 0.312 | 0.377 | 0.850 | 0.453 | 0.392 | **0.420** | 0.804 |
+| Other | 334 | 0.163 | 0.174 | 0.168 | 0.506 | 0.120 | 0.156 | 0.136 | 0.485 |
+| Food & Beverage | 293 | 0.134 | 0.215 | 0.165 | 0.703 | 0.069 | 0.085 | 0.076 | 0.560 |
+| Tourism | 252 | 0.187 | 0.246 | 0.213 | 0.591 | 0.146 | 0.214 | 0.174 | 0.476 |
+| Religious | 236 | 0.266 | 0.360 | 0.306 | 0.720 | 0.094 | 0.153 | 0.117 | 0.513 |
+| Healthcare | 198 | 0.068 | 0.141 | 0.092 | 0.621 | 0.054 | 0.136 | 0.077 | 0.434 |
+
+**Reading.** From location and neighbourhood alone (site mode), the model is twice chance on areas it never saw,
+and the true category is in its top 3 for 72% of nodes. It recognises Educational, Infrastructure and Retail.
+Retail scores *higher* in site mode than in known mode: shops are defined more by their surroundings than by how they
+were mapped. Food & Beverage, Healthcare, Religious and Other are near chance in site mode and useful only as a
+top-3 shortlist. Known mode is 0.02 below iteration 1, mostly on fold 4: part of that is the cost of sharing weights
+with site mode, and part comes from the selected configuration.
+
+### 5.6 Ablations (RO1)
+
+Each row changes one thing in the selected configuration (3 seeds; reference test F1 0.349 known / 0.241 site).
+
+| Ablation | Test F1 known | Test F1 site | What it shows |
+|---|---:|---:|---|
+| **Local features only** (coordinates, district, own attributes: 20), **graph on** | 0.363 | **0.218** | Message passing adds **+0.08** in site mode and +0.04 in known mode: **the GNN learns the neighbourhood from the graph** |
+| Local features only, **graph off** | 0.326 | 0.140 | |
+| All 66 features, graph off | 0.356 | 0.240 | With the engineered neighbourhood features (computed from the same graph), message passing adds nothing more |
+| Neighbour categories off (no label trick) | 0.358 | 0.242 | Co-location adds nothing on top of the features |
+| Neighbour categories only (no features) | 0.097 | 0.095 | Below chance: 42 to 73% of held-out nodes have no labelled neighbour under spatial CV |
+| Mask rate 0 / 0.5 / 0.7 / 1 (selected: 0.3) | 0.348 / 0.349 / 0.337 / 0.246 | 0.230 / 0.257 / 0.248 / 0.242 | Training in site mode is what makes site mode work. It costs known mode nothing up to 0.5. 0.5 is best on test, but validation preferred 0.3 (within noise) |
+| No `osm_id_rank` (4 columns) | 0.356 | 0.254 | No dependence on OSM mapping history |
+| Buffered CV (700 m) | 0.351 | 0.249 | No leakage across fold edges |
+
+### 5.7 RO2: what shapes the composition of an area
+
+Both analyses use the final models in site mode, on the held-out folds.
+
+- **Permutation importance** (a feature is shuffled across all nodes; importance is the rise in log loss).
+  Location characteristics dominate. Shuffling the `loc_` group raises log loss by 0.31 and drops macro-F1 from
+  0.247 to 0.154, while hiding all neighbour categories changes log loss by 0.002. The most important single inputs
+  describe settlement density and spacing: POIs within 100 m, the distance to the 16th and the mean distance to the
+  8 nearest POIs, density within 2 km, the distance to the nearest POI and density within 250 m. Next come the
+  sub-district's urban share, the named share of the 32 nearest POIs and household latrines within 1 km.
+- **Neighbour-type influence (occlusion).** The categories of all type-A POIs are hidden, and the change in each
+  predicted probability is measured for held-out nodes with a type-A neighbour, with every other category visible
+  (the deployment condition, where site-mode macro-F1 is 0.256). The effects are at most 1.4 percentage points but
+  structured:
+  - like attracts like (Infrastructure +1.4, Retail +1.0, Tourism +0.7, Educational +0.6);
+  - Retail and Food & Beverage go together (+0.2 each way), and a Retail neighbour lowers Infrastructure (−0.7);
+  - schools sit near churches (Educational neighbour → Religious +0.3);
+  - Healthcare follows no neighbour pattern.
+
+### 5.8 RO3: market gaps per sub-district
+
+- **Expected against observed.** For every mapped POI, the out-of-fold site-mode probabilities say what its location
+  resembles. Their sum over a sub-district is the **expected** count per category; the **observed** count is what is
+  mapped there.
+- **Prior correction.** Class weights inflate the small classes, so one factor per category is fitted (iterative
+  proportional fitting) to make the national expected totals equal the observed totals. Gaps are therefore relative
+  to the national pattern. The corrected probabilities are used only for counting (ECE 0.035).
+- **Flags.** A **gap** is flagged when z ≥ 2 and expected − observed ≥ 2 POIs; a **cluster** when z ≤ −2 and
+  observed − expected ≥ 2. Only sub-districts with at least 20 labelled POIs are flagged. A sub-district is marked
+  **thin** when its mean `attr_quality_score` is in the lowest quarter, because missing data can look like a gap.
+- **Results.** 67 of the 78 sub-districts qualify: **17 gaps and 40 clusters**.
+  - Business gaps: Healthcare (70 mapped against 107 expected) and Retail (433 against 479) in Maseru town; Retail in
+    Quthing town (33 against 48) and in Qiloane (0 against 8, thinly mapped); Tourism in Ngoajane; Food & Beverage in
+    Leribe.
+  - Clusters: Food & Beverage in Teyateyaneng and Maputsoe; Retail in Butha-Buthe.
+  - 5 of the 17 gaps are in thinly mapped sub-districts.
+
+A gap means that the locations in an area resemble where a category is found elsewhere in Lesotho, but the category is
+mapped there less often than expected. It is a hypothesis about unmet demand or missing data, not evidence of
+profitability. It is the input to the interviews with business owners (RO4).
+
+### 5.9 Output (`model_outputs_v2/`)
+
+| File | Content |
+|---|---|
+| `gnn_dual_models.pt` | The 25 trained models and everything needed to use them (D10) |
+| `oof_predictions.csv` | Every labelled node with its predictions in both modes (D7) |
+| `unlabelled_predictions.csv` | The 131 unlabelled nodes with predictions in both modes, averaged over the 5 splits (D8) |
+| `market_gaps.csv` | Expected and observed counts per sub-district and category, with flags (D9) |
+| `metrics.json` | Every table of the notebook (D10) |
+| `training_progress.log` | The training log, shown live in a separate window while the notebook ran |
+
+### 5.10 Limits
+
+- Site mode is twice chance overall but reliable only for Educational, Infrastructure and Retail.
+- The urban Maseru fold is the weakest in both modes.
+- The tuned configuration won by a margin within noise.
+- Neighbour categories add only a small co-location signal.
+- Market gaps inherit OSM's uneven coverage and say nothing about profitability (chapter 1, Section 1.6).
+
+---
+
+## Stage 6: the location-intelligence tool (`predict_poi.py`)
+
+A command-line tool on the Stage 5 model. Run it with no arguments for an interactive menu.
+
+| Command | What it does | Time |
+|---|---|---|
+| `site --lat -29.3142 --lon 27.4833` | What a candidate location suits (site mode), with the market signals of its sub-district | about 1 s |
+| `suggest --category Retail --lat -30.4005 --lon 27.7013 --radius-km 1.5` | Scores a grid of up to about 49 candidate sites (points more than 1.5 km from any mapped POI are skipped) around a location and ranks them for one category, with the number of that category already within 1 km | about 1 s per site |
+| `gaps --area Quthing` (`--all` for unflagged rows) | The `market_gaps.csv` rows of the sub-districts or districts matching a name or code | instant |
+| `new --lat ... --lon ... --name --hours --footprint-m2 120` | A POI described as it would be mapped (known mode) | about 5 s |
+| `existing --query node/4340647091` | The notebook's out-of-fold predictions for a mapped POI, both modes | instant |
+| `batch sites.csv [--known]` | Every row of a CSV (`lat`, `lon`; optional `adm2_pcode`, or the mapping attributes with `--known`) | as above, per row |
+| `--check` | Verifies the tool against the notebook (below) | about 8 min |
+
+**How a location is scored.** The location is added to the graph of the 6,083 POIs as one more node, and its 66
+features are computed with the code of Stages 2 and 3.
+- **Candidate site (site mode):** a **one-way node**. It receives messages from its k-NN partners but changes nothing
+  for the existing POIs, and only its own random-walk encoding is computed. Only its 2-hop neighbourhood is run
+  through the models.
+- **New POI (known mode):** fully inserted, and every affected feature is recomputed.
+
+In both cases all 25 models score it, each with its split's training categories visible, and their
+temperature-scaled probabilities are averaged. Label reuse is not applied (it changed test F1 by less than 0.004).
+Because training weights the small categories up, their probabilities run high: read the ranking, not the
+percentages, as odds. Every output shows each category's out-of-fold F1 and top-3 accuracy in that mode next to its
+probability.
+
+**`--check`** runs four tests:
+1. All 66 features of the 6,083 POIs are rebuilt and match `poi_engineered.csv` (largest difference 1e-6).
+2. Live predictions match the notebook's out-of-fold predictions: macro-F1 0.359 against 0.360 (known) and 0.255
+   against 0.255 (site), the same class for 98% and 96% of nodes.
+3. POIs removed and added back as new POIs get the same features and probabilities (differences below 1e-4).
+4. Spots of removed POIs scored as candidate sites agree with the notebook's site mode for about 90% of nodes, with
+   the same top-3 accuracy (73% against 70% on 30 nodes). The notebook's site-mode scores therefore hold for real
+   candidate sites.
+
+---
+
 ## Reproducing the pipeline
 
 1. Stage 1: run the snippet above (only needed if `points_of_interest.csv` is missing).
 2. Run `poi_eda.ipynb` top to bottom → `processed_poi.csv`.
 3. Run `poi_feature_engineering.ipynb` top to bottom → `poi_engineered.csv`.
+4. Run `gnn_location_model.ipynb` top to bottom → `model_outputs_v2/`. On 4 CPU threads this takes about 4 hours
+   (architecture comparison 25 min, tuning 70 min, final ensemble 15 min, ablations 2 hours, RO2 and RO3 15 min);
+   a terminal window follows `training_progress.log` while it runs. Seeds are fixed, but results can differ in the
+   third decimal between machines.
+5. Run `python predict_poi.py --check` to confirm the tool matches the notebook.
 
-Environment used: Python 3.14, pandas 3.0, NumPy 2.4, GeoPandas 1.1, SciPy 1.17, scikit-learn 1.9, matplotlib 3.10;
-PyTorch 2.14 and PyTorch Geometric 2.8 for the final check in Stage 3.
+(`model.ipynb`, iteration 1, is not needed for steps 4 and 5.)
+
+Environment used: Python 3.14, pandas 3.0, NumPy 2.4, GeoPandas 1.1, SciPy 1.17, scikit-learn 1.9, matplotlib 3.10,
+PyTorch 2.14 (CPU) and PyTorch Geometric 2.8, pyproj for `predict_poi.py`.
 
 ---
 
 ## Dictionary
 
 What each term, code, category and column in this folder means. D1 explains the terms used above and in the
-notebooks; D2 lists the codes; D3 defines the categories; D4 to D6 describe every column of the three CSV files.
+notebooks; D2 lists the codes; D3 defines the categories; D4 to D6 describe every column of the three data CSV files, and D7 to D10 the model
+outputs.
 
 ### D1. Terms
 
@@ -335,6 +586,47 @@ notebooks; D2 lists the codes; D3 defines the categories; D4 to D6 describe ever
 | Clustering coefficient | The share of pairs of a node's neighbours that are also linked to each other: high in compact clusters, low along chains. |
 | RWSE | Random-walk structural encoding: the probability that a walk starting at the node, stepping to a random neighbour each time, is back at the node after t steps (t = 2, 3, 6 and 11 are kept). |
 | Feature shift | How far the test fold's average value of a feature lies from the training folds' average, in training standard deviations. |
+
+#### Model training and evaluation (Stages 4 to 6)
+
+| Term | Meaning |
+|---|---|
+| Iteration 1, iteration 2 | The two design cycles of the model: `model.ipynb` (one mode, relies on mapping attributes) and `gnn_location_model.ipynb` (two modes). |
+| Known POI mode | The model sees all 66 features of a node, including how the node itself was mapped. Used for mapped POIs. |
+| Site mode | The node's own mapping attributes (the own-node columns) are hidden and the flag `own_attrs_hidden` is 1. The model sees only the location and its neighbourhood, as for a candidate site where no business stands yet. |
+| Own-node columns | The 10 features that describe how the node itself was mapped: the 8 `attr_` features, `ctx_osm_id_rank_vs_k32` and `ctx_footprint_vs_k32`. |
+| Mask rate | The share of the loss nodes put in site mode in each training epoch (0.3 in the final model). |
+| Label trick | Feeding training nodes' categories to the model as inputs (a one-hot vector, zeros when hidden), so it can use its neighbours' categories. In each epoch the loss is taken only on nodes whose own category is hidden. |
+| Label rate | The share of training nodes whose category is shown as an input in an epoch; drawn uniformly from 0.1 to 0.9 each epoch. |
+| Label reuse, pseudo-label | After training, confident predictions (softmax ≥ τ) of nodes outside the training folds are fed back in as visible categories (pseudo-labels) and the model runs again. No true test label is used. |
+| Distance weights | Each node's neighbours are averaged with weights `softmax(−distance / scale)` (scale 250 m), so near neighbours count more than far ones. |
+| Residual connection, jumping knowledge | A layer adds its output to its input (`h + layer(h)`), so the node's own signal is not averaged away; the classifier reads the outputs of all layers side by side. |
+| One-way node | A candidate site added to the graph so that it receives messages from its neighbours but sends none, leaving every existing POI's prediction unchanged. |
+| Validation fold | The fold used to choose settings and stop training: fold (*f* + 1) mod 5 when fold *f* is the test fold. |
+| Early stopping, patience | Training stops when the validation score has not improved for 50 epochs; the best epoch's weights are kept. |
+| Seed, seed ensemble | A seed fixes the random start of a training run. The final model trains 5 seeds per split and averages their probabilities. |
+| Out-of-fold (OOF) prediction | A node's prediction from the models that held its fold out, i.e. never trained on its area. Every labelled node has exactly one. |
+| Softmax, logit | A logit is the model's raw score per category; softmax turns the 8 scores into probabilities that sum to 1. |
+| Temperature scaling | Dividing the logits by one number *T* fitted on the validation fold, so that the probabilities match how often the model is right. It never changes the predicted category. |
+| Precision, recall, F1 | For category *c*: precision is the share of nodes predicted *c* that are *c*; recall is the share of *c* nodes predicted *c*; F1 = 2 × precision × recall / (precision + recall). |
+| Accuracy | The share of nodes given the right category. |
+| Top-k accuracy | The share of nodes whose true category is among the model's *k* most likely. |
+| Log loss (cross-entropy) | The mean of −ln(probability given to the true category). 0 is perfect; a uniform guess over 8 categories gives 2.08. |
+| Expected calibration error (ECE) | Nodes are grouped into 15 bins by their highest probability. ECE is the bin-size-weighted mean gap between each bin's average probability and its accuracy. 0 is perfectly calibrated. |
+| Calibrated | Probabilities that match frequencies: of the nodes given 30% for a category, about 30% are in it. |
+| Chance level | The macro-F1 of guessing at the class frequencies: 0.125 here. |
+| Fold SD | The standard deviation of a score over the 5 held-out folds. Differences smaller than about one fold SD are treated as noise. |
+| Validation score | The mean of known-mode and site-mode validation macro-F1; the selection criterion of Stage 5. |
+| Ablation | A run that removes or changes one part of the model, to measure what that part contributes. |
+| Local features | Features computed without any other POI: coordinates, district indicators and the node's own attributes (20 columns). Used to test whether message passing can learn the neighbourhood by itself. |
+| Permutation importance | The rise in log loss (or drop in macro-F1) when one feature's values are shuffled across nodes, breaking its link with the category. |
+| Occlusion | Hiding one input (here, the categories of all POIs of one type) and measuring how the predictions change. |
+| Deployment condition | The setting in which the tool is used: every mapped POI's category is known and visible as a neighbour category. |
+| Expected and observed count | For a sub-district and category: the sum of the nodes' corrected site-mode probabilities, and the number of nodes mapped with that category. |
+| Prior correction | One factor per category, fitted by iterative proportional fitting, that rescales the probabilities so that the national expected totals equal the observed totals. It removes the effect of the class weights before counting. |
+| z-score | (expected − observed) / √Σ p(1 − p): how many standard deviations the gap lies from zero, if the probabilities are calibrated. |
+| Gap, cluster | A gap: expected exceeds observed (z ≥ 2 and by at least 2 POIs); the locations suggest more of the category than is mapped. A cluster: the reverse (z ≤ −2). |
+| Thin mapping | A sub-district whose mean `attr_quality_score` is in the lowest quarter of sub-districts. Its gaps may come from missing data. |
 
 ### D2. Codes
 
@@ -559,6 +851,57 @@ The first 26 columns are carried over unchanged from `processed_poi.csv` and mea
 | `ctx_osm_id_rank_mean_k32`, `ctx_osm_id_rank_std_k32` | Mean and spread of `osm_id_rank` over the 32 nearest nodes |
 | `ctx_osm_id_rank_vs_k32` | The node's `osm_id_rank` minus the mean of its 32 nearest |
 | `ctx_footprint_vs_k32` | The node's log outline area minus the mean log outline area of the outlined nodes among its 32 nearest; 0 if the node has no outline |
+
+### D7. Columns of `model_outputs_v2/oof_predictions.csv`
+
+One row per labelled node (5,952). Each prediction comes from the 5-model ensemble of the split that held the node's
+fold out.
+
+| Column | Meaning |
+|---|---|
+| `node_id`, `osm_id`, `name`, `tag_key`, `tag_value`, `lon`, `lat`, `nearest_town`, `adm1_name`, `adm2_name` | Identity and location, as in D5 (for reading only) |
+| `category`, `fold` | True category and spatial fold |
+| `pred_known`, `pred_site` | Predicted category in known mode and in site mode |
+| `p_known_<category>`, `p_site_<category>` | Temperature-scaled probability of each of the 8 categories in each mode; each set of 8 sums to 1 |
+
+### D8. Columns of `model_outputs_v2/unlabelled_predictions.csv`
+
+The 131 unlabelled nodes, with the same columns as D7 except `category` and `fold`. Each node lies outside the
+training folds of every split, so its probabilities are averaged over the 5 split ensembles.
+
+### D9. Columns of `model_outputs_v2/market_gaps.csv`
+
+One row per sub-district and category (78 × 8 = 624 rows). Read by `predict_poi.py gaps` and `site`.
+
+| Column | Meaning |
+|---|---|
+| `adm1_name`, `adm2_name`, `adm2_pcode` | District, sub-district and its P-code |
+| `category` | One of the 8 categories |
+| `pois` | Labelled nodes in the sub-district |
+| `observed` | Nodes of this category mapped in the sub-district |
+| `expected` | Sum of the nodes' prior-corrected site-mode probabilities for this category |
+| `gap` | `expected − observed`: positive when the locations suggest more of the category than is mapped |
+| `z` | `gap` divided by √Σ p(1 − p) (D1) |
+| `signal` | `gap`, `cluster` or empty (rules in Stage 5.8; only sub-districts with at least 20 POIs are flagged) |
+| `mapping` | `thin` when the sub-district's mean mapping quality is in the lowest quarter, else empty |
+
+### D10. Contents of `gnn_dual_models.pt` and `metrics.json`
+
+`gnn_dual_models.pt` (load with `torch.load(..., weights_only=False)`):
+
+| Key | Content |
+|---|---|
+| `models` | 25 entries of `{fold, seed, state}`: the test fold of the split, the seed and the model weights |
+| `cfg` | The final configuration (layer type, width, depth, dropout, mask rate, label rate, distance scale, ...) |
+| `features`, `own_cols`, `binary`, `continuous` | The 66 input columns in model order, the 10 own-node columns, and the binary (kept 0/1) and continuous (standardised) columns |
+| `scalers` | Per split, the mean and SD of each continuous column on the non-test folds |
+| `cats`, `k` | The category order of the outputs, and k = 8 |
+| `temperatures` | Per mode and split, the fitted temperature of each seed's model |
+| `reuse`, `reuse_settings`, `seeds` | The label-reuse setting chosen on validation, all settings tried, and the seeds |
+
+`metrics.json` sections: `architecture_comparison`, `selected_architecture`, `tuning`, `selected_config`, `final`
+(reuse table, per-fold, pooled and per-class scores in both modes), `ablations`, `ro2_permutation_importance`,
+`ro2_neighbour_influence_pp`, `ro2_site_f1_deployment`, `ro3_prior_factors` and `ro3_flagged`.
 
 ## Licence
 
