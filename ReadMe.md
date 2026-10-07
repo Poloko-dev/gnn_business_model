@@ -16,6 +16,10 @@ processed_poi.csv              6,083 nodes x 43 columns
         │  Stage 3: poi_feature_engineering.ipynb (model-ready features)
         ▼
 poi_engineered.csv             6,083 nodes x 92 columns (66 model features)
+        │  gnn_location_model.ipynb (dual-mode GraphSAGE, ablations, RO2/RO3 analyses)
+        ▼
+model_outputs_v2/              25 trained models, predictions in both modes, market gaps, metrics
+        │  predict_poi.py (score a candidate site, suggest sites, market gaps)
 ```
 
 ## Files
@@ -29,6 +33,11 @@ poi_engineered.csv             6,083 nodes x 92 columns (66 model features)
 | `processed_poi.csv` | Stage 2 output: one cleaned row per graph node |
 | `poi_feature_engineering.ipynb` | Stage 3 notebook: feature engineering |
 | `poi_engineered.csv` | Stage 3 output: the table the GNN is trained on |
+| `poi_engineered_vis.ipynb` | Visual analysis of the engineered features, which informed the model design |
+| `model.ipynb`, `model_outputs/` | Model iteration 1: GraphSAGE that relies on how each POI is mapped (test macro-F1 0.375); kept as the record of the first design cycle |
+| `gnn_location_model.ipynb` | Model iteration 2: one GraphSAGE trained in two modes (known POI / candidate site), with architecture comparison, tuning, ablations, RO2 (what shapes an area) and RO3 (market gaps) |
+| `model_outputs_v2/` | Iteration 2 outputs: `gnn_dual_models.pt` (25 models), out-of-fold and unlabelled predictions in both modes, `market_gaps.csv`, `metrics.json`, training log |
+| `predict_poi.py` | Command-line tool on the iteration 2 model: `site`, `suggest`, `gaps`, `new`, `existing`, `batch`, and `--check` against the notebook (run `python predict_poi.py -h`) |
 
 ---
 

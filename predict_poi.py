@@ -1,23 +1,33 @@
-"""Predict the category of a point of interest (POI) in Lesotho with the trained GraphSAGE model from model.ipynb.
+"""Business location intelligence for Lesotho with the dual-mode GraphSAGE model of gnn_location_model.ipynb.
 
-Run it with no arguments for an interactive session: the model is loaded once and you choose what to predict.
+Run it with no arguments for an interactive session: the model is loaded once and you choose what to do.
 
-    python predict_poi.py                       interactive menu
+    python predict_poi.py                                   interactive menu
+    python predict_poi.py site --lat -29.315 --lon 27.487   what this location suits (no other input needed)
+    python predict_poi.py suggest --category Retail --lat -29.315 --lon 27.487 --radius-km 2
+                                                            best spots for a category around a location
+    python predict_poi.py gaps --area Mafeteng              market gaps of the sub-districts matching a name or code
     python predict_poi.py new --lat -29.315 --lon 27.487 --name --hours
-    python predict_poi.py existing --query "node/4340647091"      (node_id, osm_id or part of a name)
-    python predict_poi.py batch my_pois.csv --out my_predictions.csv
-    python predict_poi.py --check               verify features and predictions against the notebook's outputs
+                                                            a POI described as it would be mapped in OSM
+    python predict_poi.py existing --query "node/4340647091"   (node_id, osm_id or part of a name)
+    python predict_poi.py batch my_sites.csv [--known] --out my_predictions.csv
+    python predict_poi.py --check                           verify features and predictions against the notebook
 
-How a new POI is predicted. The model is a graph model, so a new POI cannot be scored on its own: it is added to the
-graph of the 6,083 existing POIs as one more node. Every feature is then recomputed the way poi_eda.ipynb and
-poi_feature_engineering.ipynb compute it (densities, towns, neighbourhood shape, district context, the mapping
-profile of the area and the graph-structure encodings), the k = 8 nearest-neighbour graph is rebuilt, and all 25
-trained models (5 CV splits x 5 seeds) score it. The new POI's label is never shown to the models. Each POI in a batch
-is added and scored on its own.
+One model, two modes (gnn_location_model.ipynb):
+  site mode   the model sees only the location and its neighbourhood (densities, distances, towns, the shape and
+              mapping profile of the surroundings, the categories of the nearest POIs). This is the mode for a
+              candidate site where no business stands yet. Test macro-F1 0.245 on areas the model never saw
+              (2x chance); the true category is among its 3 most likely in 72% of cases.
+  known mode  the model also sees how the POI itself is mapped (name, address, opening hours, building outline).
+              Test macro-F1 0.356; true category in the top 3 in 83% of cases.
 
-What you describe for a new POI is how it would be mapped in OpenStreetMap: whether it has a name, an address, opening
-hours, a building outline (and its area), and whether it is a point. These attributes carry most of the model's
-signal (model.ipynb, Section 6), so set them as the place would really be mapped.
+How a location is scored. The model is a graph model, so a location is added to the graph of the 6,083 existing
+POIs as one more node and its features are computed the way poi_eda.ipynb and poi_feature_engineering.ipynb compute
+them. A candidate site (site mode) is a one-way node: it receives messages from its k = 8 nearest POIs but changes
+nothing for the existing ones. A new POI in known mode is fully inserted, as a newly mapped place would be. All 25
+trained models (5 CV splits x 5 seeds) score it, each with the training labels of its split visible as neighbour
+categories, and their temperature-scaled probabilities are averaged. Label reuse, which the notebook selected on
+validation, is not applied here: it changed test macro-F1 by less than 0.004.
 """
 import argparse
 import copy
@@ -32,6 +42,7 @@ import pandas as pd
 from scipy import sparse
 from scipy.sparse.csgraph import connected_components, dijkstra
 from scipy.spatial import cKDTree
+from sklearn.metrics import f1_score
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", message="IProgress not found")
@@ -40,21 +51,27 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as Fn
 from pyproj import Transformer
-from torch_geometric.nn import GATv2Conv, SAGEConv
-from torch_geometric.utils import to_undirected
+from torch_geometric.nn import GATv2Conv, GCNConv, MessagePassing
+from torch_geometric.utils import k_hop_subgraph, softmax, to_undirected
 
 HERE = Path(__file__).resolve().parent
 PROCESSED_CSV = HERE / "processed_poi.csv"
 ENGINEERED_CSV = HERE / "poi_engineered.csv"
 RAW_CSV = HERE / "points_of_interest.csv"
-MODEL_PT = HERE / "model_outputs" / "gnn_final_models.pt"
-METRICS_JSON = HERE / "model_outputs" / "metrics.json"
+OUT = HERE / "model_outputs_v2"
+MODEL_PT = OUT / "gnn_dual_models.pt"
+METRICS_JSON = OUT / "metrics.json"
+OOF_CSV = OUT / "oof_predictions.csv"
+UNL_CSV = OUT / "unlabelled_predictions.csv"
+GAPS_CSV = OUT / "market_gaps.csv"                 # written by gnn_location_model.ipynb, Section 9
 
 K, KMAX = 8, 32                              # k-NN graph of the model; neighbourhood size of the ctx_ features
 TOWN_MIN_POIS, TOWN_RADIUS_M = 50, 2000      # EDA town rule
 N_FOLDS = 5
+MODES = ("site", "known")
 BBOX = (27.0115, -30.6756, 29.4557, -28.5706)   # Lesotho (lon_min, lat_min, lon_max, lat_max), from README.txt
 TO_UTM = Transformer.from_crs("EPSG:4326", "EPSG:32735", always_xy=True)   # UTM 35S, as in poi_eda.ipynb
+TO_LL = Transformer.from_crs("EPSG:32735", "EPSG:4326", always_xy=True)
 
 # Raw EDA column -> engineered column; True where the feature notebook applies log1p
 RAW_NAMES = {
@@ -73,35 +90,78 @@ ATTRS = ["has_name", "has_address", "has_hours", "has_footprint", "log_footprint
 
 
 # --------------------------------------------------------------------------------------------------------------------
-# Model (identical to model.ipynb, Section 2; dropout is inactive at prediction time)
+# Model (identical to gnn_location_model.ipynb, Section 2; dropout is inactive at prediction time)
 # --------------------------------------------------------------------------------------------------------------------
+class WSAGEConv(MessagePassing):
+    """GraphSAGE layer with a weighted neighbour mean: lin_nbr(sum_j w_ji x_j) + lin_root(x_i)."""
+
+    def __init__(self, d_in, d_out):
+        super().__init__(aggr="add")
+        self.lin_nbr = nn.Linear(d_in, d_out)
+        self.lin_root = nn.Linear(d_in, d_out, bias=False)
+
+    def forward(self, x, edge_index, edge_weight):
+        return self.lin_nbr(self.propagate(edge_index, x=x, w=edge_weight)) + self.lin_root(x)
+
+    def message(self, x_j, w):
+        return w.unsqueeze(1) * x_j
+
+
 class GNN(nn.Module):
-    def __init__(self, in_dim, n_classes, conv="sage", hidden=128, layers=2, heads=4, dropout=0.3,
-                 input_dropout=0.1, attn_dropout=0.1, label_input=False, **_):
+    def __init__(self, in_dim, n_classes, conv="sage", hidden=64, layers=2, heads=4, attn_dropout=0.1,
+                 label_input=True, **_):
         super().__init__()
-        self.label_input = label_input
-        self.in_drop, self.drop = nn.Dropout(input_dropout), nn.Dropout(dropout)
-        self.enc = nn.Linear(in_dim + (n_classes if label_input else 0), hidden)
+        self.conv_type, self.label_input = conv, label_input
+        self.in_drop, self.drop = nn.Identity(), nn.Identity()
+        self.enc = nn.Linear(in_dim + n_classes, hidden)
         self.enc_norm = nn.BatchNorm1d(hidden)
         self.convs, self.norms = nn.ModuleList(), nn.ModuleList()
         for _ in range(layers):
             if conv == "sage":
-                self.convs.append(SAGEConv(hidden, hidden, aggr="mean", root_weight=True))
+                self.convs.append(WSAGEConv(hidden, hidden))
+            elif conv == "gcn":
+                self.convs.append(GCNConv(hidden, hidden, add_self_loops=True, normalize=True))
             else:
-                self.convs.append(GATv2Conv(hidden, hidden // heads, heads=heads, concat=True,
-                                            dropout=attn_dropout, add_self_loops=True))
+                self.convs.append(GATv2Conv(hidden, hidden // heads, heads=heads, concat=True, dropout=attn_dropout,
+                                            add_self_loops=True, edge_dim=1))
             self.norms.append(nn.BatchNorm1d(hidden))
         self.head = nn.Linear(hidden * (layers + 1), n_classes)
 
-    def forward(self, x, edge_index, label_onehot=None):
-        if self.label_input:
-            x = torch.cat([x, label_onehot], dim=1)
-        h = self.drop(Fn.relu(self.enc_norm(self.enc(self.in_drop(x)))))
+    def _conv(self, conv, h, g):
+        if self.conv_type == "sage":
+            return conv(h, g["ei"], g["w"])
+        if self.conv_type == "gcn":
+            return conv(h, g["ei"], g["w_gcn"])
+        return conv(h, g["ei"], g["ea"])
+
+    def forward(self, x, g, label_onehot):
+        if not self.label_input:
+            label_onehot = torch.zeros_like(label_onehot)
+        h = Fn.relu(self.enc_norm(self.enc(torch.cat([x, label_onehot], dim=1))))
         hs = [h]
         for conv, norm in zip(self.convs, self.norms):
-            h = h + self.drop(Fn.relu(norm(conv(h, edge_index))))
+            h = h + Fn.relu(norm(self._conv(conv, h, g)))
             hs.append(h)
         return self.head(torch.cat(hs, dim=1))
+
+
+def undirected_knn(XY):
+    """k = 8 nearest-neighbour graph, undirected, self excluded (as in the notebook)."""
+    n = len(XY)
+    _, nn_i = cKDTree(XY).query(XY, k=K + 2)
+    nn_i = nn_i[nn_i != np.arange(n)[:, None]].reshape(n, K + 1)[:, :K]
+    return to_undirected(torch.tensor(np.vstack([np.repeat(np.arange(n), K), nn_i.ravel()])), num_nodes=n)
+
+
+def graph_tensors(edge_index, XY, dist_scale, logd_stats):
+    """Edge weights of the model: softmax(-d / dist_scale) over each node's incoming edges (plain mean if None)."""
+    n = len(XY)
+    src, dst = edge_index
+    d = torch.tensor(np.hypot(*(XY[src.numpy()] - XY[dst.numpy()]).T), dtype=torch.float32)
+    deg = torch.bincount(dst, minlength=n).float()
+    w = 1.0 / deg[dst] if dist_scale is None else softmax(-d / dist_scale, dst, num_nodes=n)
+    ea = ((torch.log1p(d) - logd_stats[0]) / logd_stats[1]).unsqueeze(1)
+    return {"ei": edge_index, "w": w, "w_gcn": w * deg[dst], "ea": ea}
 
 
 # --------------------------------------------------------------------------------------------------------------------
@@ -255,6 +315,7 @@ def engineer(df, feature_names, rw_base=None, rw_cols=None):
     return X, info
 
 
+
 # --------------------------------------------------------------------------------------------------------------------
 # The predictor: loads the data and the 25 models once
 # --------------------------------------------------------------------------------------------------------------------
@@ -265,26 +326,25 @@ class Predictor:
         self.eng = pd.read_csv(ENGINEERED_CSV, keep_default_na=False, na_values=[""])
         assert self.base["node_id"].tolist() == list(range(len(self.base))) == self.eng["node_id"].tolist()
         assert self.base["osm_id"].equals(self.eng["osm_id"])
-        ck = torch.load(MODEL_PT, weights_only=True)
-        self.cfg, self.feats, self.classes = ck["config"], ck["features"], ck["classes"]
-        self.offsets = {int(f): np.array(v) for f, v in ck["offsets"].items()}
+        ck = torch.load(MODEL_PT, weights_only=False)
+        self.cfg, self.feats, self.classes = ck["cfg"], ck["features"], ck["cats"]
         self.C = len(self.classes)
-
-        # Per-split scaler: continuous features only, fitted on the non-test folds (as in model.ipynb)
-        binary = set(ck["binary_features"])
-        self.cont = np.array([c not in binary for c in self.feats])
-        X0 = self.eng[self.feats].to_numpy(np.float64)
-        fold0 = self.eng["fold"].to_numpy()
+        self.own_idx = np.array([self.feats.index(c) for c in ck["own_cols"]])
+        cont = set(ck["continuous"])
+        self.cont = np.array([c in cont for c in self.feats])
+        assert [c for c in self.feats if c in cont] == ck["continuous"]
         self.scaler = {}
         for f in range(N_FOLDS):
-            mu, sd = X0[fold0 != f][:, self.cont].mean(0), X0[fold0 != f][:, self.cont].std(0)
+            mu, sd = np.array(ck["scalers"][f]["mean"]), np.array(ck["scalers"][f]["sd"])
             sd[sd == 0] = 1.0
             self.scaler[f] = (mu, sd)
         self.models = {f: [] for f in range(N_FOLDS)}
-        for m in ck["models"]:
-            net = GNN(len(self.feats), self.C, **self.cfg)
-            net.load_state_dict(m["state_dict"])
-            self.models[int(m["test_fold"])].append(net.eval())
+        for rec in ck["models"]:                          # stored in split, then seed order (as the temperatures)
+            net = GNN(len(self.feats) + 1, self.C, **self.cfg)
+            net.load_state_dict(rec["state"])
+            self.models[int(rec["fold"])].append(net.eval())
+        self.temps = {m: {int(f): list(t) for f, t in ck["temperatures"][m].items()} for m in MODES}
+        assert all(len(self.temps[m][f]) == len(self.models[f]) for m in MODES for f in range(N_FOLDS))
 
         # Raw inputs needed to add a node: latrine positions and the stored random-walk encodings
         raw = pd.read_csv(RAW_CSV, dtype=str, encoding="utf-8-sig", keep_default_na=False, na_values=[""],
@@ -293,56 +353,73 @@ class Predictor:
         self.latrine_tree = cKDTree(np.c_[TO_UTM.transform(toilets["longitude"].astype(float).to_numpy(),
                                                            toilets["latitude"].astype(float).to_numpy())])
         self.rw_names = [c for c in self.feats if c.startswith("struct_rwse_")]
-        self._set_base(self.base, self.eng[self.rw_names].to_numpy(np.float64))
+        xy0 = self.base[["x_km", "y_km"]].to_numpy() * 1000
+        ei0 = undirected_knn(xy0)
+        logd = torch.log1p(torch.tensor(np.hypot(*(xy0[ei0[0].numpy()] - xy0[ei0[1].numpy()]).T), dtype=torch.float32))
+        self.logd = (logd.mean(), logd.std())             # GAT edge-feature scaling of the notebook
+        self._set_base(self.base, self.eng[self.rw_names].to_numpy(np.float64), self.eng[self.feats].to_numpy(np.float64))
 
-        # Predictions for the existing graph (used for existing POIs)
-        self.base_probs = self._run(X0, self.XY)
+        # Stored notebook predictions for the existing POIs (out-of-fold for the labelled ones)
+        oof = pd.read_csv(OOF_CSV).set_index("node_id")
+        unl = pd.read_csv(UNL_CSV).set_index("node_id")
+        self.stored = {m: pd.concat([oof, unl])[[f"p_{m}_{c}" for c in self.classes]].sort_index() for m in MODES}
+        assert self.stored["site"].index.tolist() == list(range(self.n))
+        self.class_metrics = {}
         try:
-            pc = json.loads(METRICS_JSON.read_text(encoding="utf-8"))["final_per_class"]
-            self.class_f1 = {r["category"]: r["F1 raw"] for r in pc}
+            pc = json.loads(METRICS_JSON.read_text(encoding="utf-8"))["final"]["per_class"]
+            self.class_metrics = {m: {r["index"]: (r["F1"], r["top-3"]) for r in pc[m]} for m in MODES}
         except (OSError, KeyError, ValueError):
-            self.class_f1 = {}
-        print(f"Model loaded: {sum(len(v) for v in self.models.values())} GraphSAGE models, {len(self.feats)} features, "
-              f"{self.n:,} existing POIs ({time.time() - t0:.1f}s)")
+            pass
+        self.gaps = pd.read_csv(GAPS_CSV, keep_default_na=False) if GAPS_CSV.exists() else None
+        print(f"Model loaded: {sum(len(v) for v in self.models.values())} GraphSAGE models (dual-mode), "
+              f"{len(self.feats)} features, {self.n:,} existing POIs ({time.time() - t0:.1f}s)")
 
-    def _set_base(self, base, rw_base):
-        """The existing graph a new POI is added to: raw EDA table and stored random-walk encodings."""
-        self.base, self.rw_base, self.n = base, rw_base, len(base)
+    def _set_base(self, base, rw_base, X0):
+        """The existing graph new nodes are added to: raw EDA table, engineered features, random-walk encodings."""
+        self.base, self.rw_base, self.X0, self.n = base, rw_base, X0, len(base)
         self.fold = base["fold"].to_numpy()
         self.labelled = base["is_labelled"].eq(1).to_numpy()
         self.y = base["label"].to_numpy()
+        self.cat = base["category"].to_numpy()
         self.visible = {f: self.labelled & (self.fold != f) & (self.fold != (f + 1) % N_FOLDS) for f in range(N_FOLDS)}
         self.XY = base[["x_km", "y_km"]].to_numpy() * 1000
         self.tree = cKDTree(self.XY)
+        self.EI = undirected_knn(self.XY)
         self.A0 = knn_adjacency(neighbours(self.XY)[0], self.n)[1]
         self.__dict__.pop("_txy0", None)
 
     # -- model ---------------------------------------------------------------------------------------------------------
-    def _run(self, X, XY):
-        """Softmax of every node for each test-fold ensemble: {fold: (n, C)}, mean over that fold's 5 seeds."""
-        n = len(XY)
-        _, nn_i = cKDTree(XY).query(XY, k=K + 2)
-        nn_i = nn_i[nn_i != np.arange(n)[:, None]].reshape(n, K + 1)[:, :K]
-        edge_index = to_undirected(torch.tensor(np.vstack([np.repeat(np.arange(n), K), nn_i.ravel()])), num_nodes=n)
+    def _scale(self, X, f, site_rows):
+        Xs = X.copy()
+        mu, sd = self.scaler[f]
+        Xs[:, self.cont] = (Xs[:, self.cont] - mu) / sd
+        Xs = np.c_[Xs, np.zeros(len(Xs))]
+        if site_rows is not None and len(site_rows):
+            Xs[np.ix_(site_rows, self.own_idx)] = 0.0          # own-node attributes hidden ...
+            Xs[site_rows, -1] = 1.0                            # ... and flagged as hidden
+        return torch.tensor(Xs, dtype=torch.float32)
+
+    def _score(self, X, edge_index, XY, targets, mode, folds):
+        """Temperature-scaled ensemble probabilities of the target nodes for each split: {fold: (len(targets), C)}.
+        Only the targets' L-hop neighbourhood is run (their output depends on nothing else). In site mode the
+        targets' own attributes are hidden. Neighbour categories: the split's training labels (new nodes: none)."""
+        targets = torch.as_tensor(np.atleast_1d(targets))
+        g_full = graph_tensors(edge_index, XY, self.cfg["dist_scale"], self.logd)
+        subset, ei_sub, mapping, emask = k_hop_subgraph(targets, max(self.cfg["layers"], 1), edge_index,
+                                                        relabel_nodes=True, num_nodes=len(XY))
+        g = {"ei": ei_sub, "w": g_full["w"][emask], "w_gcn": g_full["w_gcn"][emask], "ea": g_full["ea"][emask]}
+        sub = subset.numpy()
+        old = sub[sub < self.n]
         out = {}
         with torch.no_grad():
-            for f in range(N_FOLDS):
-                Xs = X.copy()
-                mu, sd = self.scaler[f]
-                Xs[:, self.cont] = (Xs[:, self.cont] - mu) / sd
-                xt = torch.tensor(Xs, dtype=torch.float32)
-                lab = torch.zeros(n, self.C)
-                vis = np.flatnonzero(self.visible[f])            # new nodes (index >= self.n) are never visible
-                lab[vis, self.y[vis]] = 1.0
-                out[f] = np.mean([Fn.softmax(m(xt, edge_index, lab), 1).numpy() for m in self.models[f]], axis=0)
+            for f in folds:
+                x = self._scale(X[sub], f, mapping.numpy() if mode == "site" else None)
+                lab = torch.zeros(len(sub), self.C)
+                vis = np.flatnonzero(sub < self.n)[self.visible[f][old]]
+                lab[vis, self.y[sub[vis]]] = 1.0
+                out[f] = np.mean([Fn.softmax(m(x, g, lab)[mapping] / t, 1).numpy()
+                                  for m, t in zip(self.models[f], self.temps[mode][f])], axis=0)
         return out
-
-    def _combine(self, probs_by_fold, folds, calibrated):
-        if calibrated:
-            lp = np.mean([np.log(probs_by_fold[f] + 1e-9) + self.offsets[f] for f in folds], axis=0)
-            p = np.exp(lp - lp.max())
-            return p / p.sum()
-        return np.mean([probs_by_fold[f] for f in folds], axis=0)
 
     # -- existing POIs -------------------------------------------------------------------------------------------------
     def find(self, query):
@@ -355,27 +432,25 @@ class Predictor:
             return hit.tolist()
         return self.base.index[self.base["name"].str.contains(q, case=False, na=False, regex=False)].tolist()
 
-    def predict_existing(self, i, calibrated=False):
-        """Labelled POIs: the ensemble whose split held their fold out (never trained on them). Unlabelled: all 25."""
-        folds = [int(self.fold[i])] if self.labelled[i] else list(range(N_FOLDS))
-        p = self._combine({f: v[i] for f, v in self.base_probs.items()}, folds, calibrated)
+    def predict_existing(self, i):
+        """The notebook's predictions: labelled POIs by the split that held their fold out, unlabelled by all 25."""
         r = self.base.loc[i]
-        return {"probs": p, "true": r["category"] if self.labelled[i] else None, "lat": r["lat"], "lon": r["lon"],
+        return {"probs": {m: self.stored[m].loc[i].to_numpy() for m in MODES},
+                "true": r["category"] if self.labelled[i] else None, "lat": r["lat"], "lon": r["lon"],
                 "title": f"node {i} | {r['osm_id']} | {r['name'] if isinstance(r['name'], str) else '(unnamed)'} | "
                          f"tagged {r['tag_key']}={r['tag_value']}",
                 "context": self._context(i, self.base, self.base["nearest_town"].iloc[i], r["dist_town_km"],
-                                         self.base_nbr_labels(i)),
-                "note": (f"out-of-fold prediction (models that did not train on fold {self.fold[i]})"
-                         if self.labelled[i] else "unlabelled POI: mean of all 25 models")}
+                                         self.cat[self._knn(self.XY[i], exclude=i)]),
+                "note": (f"out-of-fold predictions (models that did not train on fold {self.fold[i]})"
+                         if self.labelled[i] else "unlabelled POI: mean of all 25 models"),
+                "adm2_pcode": r["adm2_pcode"]}
 
-    def base_nbr_labels(self, i):
-        _, idx = self.tree.query(self.XY[i], k=K + 1)
-        idx = [j for j in idx if j != i][:K]
-        return self.base["category"].to_numpy()[idx]
+    def _knn(self, xy, exclude=None):
+        _, idx = self.tree.query(xy, k=K + 1)
+        return [j for j in idx if j != exclude][:K]
 
-    # -- new POIs ------------------------------------------------------------------------------------------------------
-    def predict_new(self, lat, lon, has_name=0, has_address=0, has_hours=0, footprint_m2=0.0, is_point=None,
-                    osm_id_rank=None, adm2_pcode=None, calibrated=False):
+    # -- new nodes -----------------------------------------------------------------------------------------------------
+    def _new_row(self, lat, lon, has_name, has_address, has_hours, footprint_m2, is_point, osm_id_rank, adm2_pcode):
         lat, lon = float(lat), float(lon)
         if not (BBOX[0] <= lon <= BBOX[2] and BBOX[1] <= lat <= BBOX[3]):
             raise ValueError(f"({lat}, {lon}) is outside Lesotho's bounding box "
@@ -386,25 +461,11 @@ class Predictor:
         x, y = TO_UTM.transform(lon, lat)
         xy_new = np.array([round(x / 1000, 4), round(y / 1000, 4)]) * 1000
         d = np.hypot(*(self.XY - xy_new).T)                     # distance of every existing node to the new one
-
-        # District and sub-district: given, or those of the nearest existing POI (no boundary polygons here)
         b = self.base
         if adm2_pcode and not b["adm2_pcode"].eq(adm2_pcode).any():
             raise ValueError(f"unknown adm2_pcode {adm2_pcode!r}")
+        # District and sub-district: given, or those of the nearest existing POI (no boundary polygons here)
         src = b.index[b["adm2_pcode"].eq(adm2_pcode)][0] if adm2_pcode else int(np.argmin(d))
-
-        # Raw EDA columns: existing nodes keep their stored values, updated for the one extra node nearby
-        df = b.copy()
-        for r, c in [(500, "density_500m"), (2000, "density_2km"), (10000, "density_10km")]:
-            df[c] = df[c] + (d <= r)
-        df["is_urban"] = (df["density_2km"] >= TOWN_MIN_POIS).astype(int)
-        df["nn1_dist_m"] = np.minimum(df["nn1_dist_m"], d.round(1))
-        _, nb_d0 = self.tree.query(self.XY, k=K + 1)            # column 0 is the node itself (or a twin at 0 m)
-        hit = np.flatnonzero(d < nb_d0[:, K])                   # the new node enters these nodes' 8 nearest
-        for i in hit:
-            dd = np.sort(np.r_[np.hypot(*(self.XY - self.XY[i]).T), d[i]])[1:K + 1]
-            df.loc[i, "knn8_mean_dist_m"] = round(dd.mean(), 1)
-
         nb_d = np.sort(d)
         new_rank = (osm_id_rank if osm_id_rank is not None
                     else float(b["osm_id_rank"].to_numpy()[np.argsort(d)[:KMAX]].mean()))
@@ -421,6 +482,51 @@ class Predictor:
             **{c: b.loc[src, c] for c in ["adm1_pcode", "adm1_name", "adm2_pcode", "adm2_name"]},
         }
         new["is_urban"] = int(new["density_2km"] >= TOWN_MIN_POIS)
+        return lat, lon, xy_new, d, new
+
+    def predict_site(self, lat, lon, adm2_pcode=None, folds=None):
+        """Site mode for a candidate location: a one-way node (it receives messages from the POIs around it and
+        changes nothing for them) whose own mapping attributes are hidden."""
+        lat, lon, xy_new, d, new = self._new_row(lat, lon, 0, 0, 0, 0.0, None, None, adm2_pcode)
+        df = pd.concat([self.base, pd.DataFrame([new])], ignore_index=True)
+        XY_all = np.vstack([self.XY, xy_new])
+        _, TXY = build_towns(XY_all, df["density_2km"].to_numpy(), df["is_urban"].to_numpy().astype(bool),
+                             df["adm2_name"].to_numpy(), cKDTree(XY_all))
+        d_town = np.hypot(*(TXY - xy_new).T)
+        df.loc[self.n, "dist_town_km"] = round(d_town.min() / 1000, 3)
+        df.loc[self.n, "dist_maseru_km"] = round(d_town[0] / 1000, 3)
+        rw_base = np.vstack([self.rw_base, np.zeros((1, len(self.rw_names)))])
+        X_all, info = engineer(df, self.feats, rw_base=rw_base, rw_cols=np.array([self.n]))
+        X = np.vstack([self.X0, X_all[self.n]])                  # existing nodes keep their features
+        nbr = info["nbr"][:, :K]
+        into = np.union1d(nbr[self.n], np.flatnonzero((nbr[:self.n] == self.n).any(1)))   # undirected k-NN partners
+        ei = torch.cat([self.EI, torch.tensor(np.vstack([into, np.full(len(into), self.n)]))], dim=1)
+        folds = list(range(N_FOLDS)) if folds is None else folds
+        fp = {f: v[0] for f, v in self._score(X, ei, XY_all, [self.n], "site", folds).items()}
+        town = info["town_names"][info["nearest_town"][self.n]]
+        return {"probs": {"site": np.mean(list(fp.values()), axis=0)}, "fold_probs": fp, "true": None,
+                "lat": lat, "lon": lon, "x": X[self.n], "adm2_pcode": new["adm2_pcode"],
+                "title": f"Candidate site at ({lat:.5f}, {lon:.5f})",
+                "context": self._context(self.n, df, town, info["dist_town_km"][self.n], self.cat[nbr[self.n]]),
+                "note": f"site mode, mean of {sum(len(self.models[f]) for f in folds)} models",
+                "town": town, "dist_town_km": float(info["dist_town_km"][self.n]), "density_2km": new["density_2km"]}
+
+    def predict_new(self, lat, lon, has_name=0, has_address=0, has_hours=0, footprint_m2=0.0, is_point=None,
+                    osm_id_rank=None, adm2_pcode=None, folds=None):
+        """Known mode for a POI described as it would be mapped: fully inserted into the graph, as a newly mapped
+        place would be, and every feature recomputed."""
+        lat, lon, xy_new, d, new = self._new_row(lat, lon, has_name, has_address, has_hours, footprint_m2, is_point,
+                                                 osm_id_rank, adm2_pcode)
+        # Raw EDA columns: existing nodes keep their stored values, updated for the one extra node nearby
+        df = self.base.copy()
+        for r, c in [(500, "density_500m"), (2000, "density_2km"), (10000, "density_10km")]:
+            df[c] = df[c] + (d <= r)
+        df["is_urban"] = (df["density_2km"] >= TOWN_MIN_POIS).astype(int)
+        df["nn1_dist_m"] = np.minimum(df["nn1_dist_m"], d.round(1))
+        _, nb_d0 = self.tree.query(self.XY, k=K + 1)            # column 0 is the node itself (or a twin at 0 m)
+        for i in np.flatnonzero(d < nb_d0[:, K]):               # the new node enters these nodes' 8 nearest
+            dd = np.sort(np.r_[np.hypot(*(self.XY - self.XY[i]).T), d[i]])[1:K + 1]
+            df.loc[i, "knn8_mean_dist_m"] = round(dd.mean(), 1)
         df = pd.concat([df, pd.DataFrame([new])], ignore_index=True)
 
         # Towns: if the extra node changes them, distances to towns are recomputed for every node
@@ -445,16 +551,16 @@ class Predictor:
         rw_base = np.vstack([self.rw_base, np.zeros((1, len(self.rw_names)))])
         X, info = engineer(df, self.feats, rw_base=rw_base, rw_cols=rw_cols)
 
-        probs = self._run(X, XY_all)
-        p = self._combine({f: v[self.n] for f, v in probs.items()}, list(range(N_FOLDS)), calibrated)
-        nbr_cats = self.base["category"].to_numpy()[nbr_all[self.n, :K]]
-        return {"probs": p, "true": None, "lat": lat, "lon": lon, "x": X[self.n],
-                "fold_probs": {f: v[self.n] for f, v in probs.items()},
-                "title": f"new POI at ({lat:.5f}, {lon:.5f}) | name {bool(has_name)}, address {bool(has_address)}, "
-                         f"hours {bool(has_hours)}, outline {footprint_m2:,.0f} m2, point {bool(is_point)}",
+        folds = list(range(N_FOLDS)) if folds is None else folds
+        fp = {f: v[0] for f, v in self._score(X, undirected_knn(XY_all), XY_all, [self.n], "known", folds).items()}
+        return {"probs": {"known": np.mean(list(fp.values()), axis=0)}, "fold_probs": fp, "true": None,
+                "lat": lat, "lon": lon, "x": X[self.n], "adm2_pcode": new["adm2_pcode"],
+                "title": f"New POI at ({lat:.5f}, {lon:.5f}) | name {bool(has_name)}, address {bool(has_address)}, "
+                         f"hours {bool(has_hours)}, outline {float(footprint_m2 or 0):,.0f} m2, point {bool(new['is_point'])}",
                 "context": self._context(self.n, df, info["town_names"][info["nearest_town"][self.n]],
-                                         info["dist_town_km"][self.n], nbr_cats),
-                "note": "mean of all 25 models" + ("; adding it changed the town centres" if towns_changed else "")
+                                         info["dist_town_km"][self.n], self.cat[nbr_all[self.n, :K]]),
+                "note": f"known mode, mean of {sum(len(self.models[f]) for f in folds)} models"
+                        + ("; adding it changed the town centres" if towns_changed else "")
                         + ("" if osm_id_rank is not None else "; mapping date set to that of its surroundings")}
 
     def _base_TXY(self):
@@ -472,40 +578,119 @@ class Predictor:
                 f"{int(r['density_2km'])} within 2 km | {'urban' if r['density_2km'] >= TOWN_MIN_POIS else 'rural'}\n"
                 f"  8 nearest mapped POIs: " + ", ".join(f"{c} {n}" for c, n in cats.items()))
 
+    # -- location intelligence -----------------------------------------------------------------------------------------
+    def suggest(self, category, lat, lon, radius_km=2.0, step_m=None, max_points=49, top=10, max_gap_m=1500,
+                progress=True):
+        """Score a grid of candidate sites around a location in site mode and rank them by the probability of
+        `category`. Points more than max_gap_m from any mapped POI are skipped (outside the mapped area the model
+        has nothing to go on)."""
+        if category not in self.classes:
+            raise ValueError(f"unknown category {category!r}; choose from {self.classes}")
+        c = self.classes.index(category)
+        cx, cy = TO_UTM.transform(float(lon), float(lat))
+        r = float(radius_km) * 1000
+        step = step_m or max(100.0, np.sqrt(np.pi * r * r / max_points))
+        g = np.arange(-r, r + 1e-6, step)
+        pts = np.array([(cx + dx, cy + dy) for dx in g for dy in g if dx * dx + dy * dy <= r * r])
+        near, _ = self.tree.query(pts)
+        pts = pts[near <= max_gap_m]
+        if not len(pts):
+            raise ValueError(f"no mapped POI within {max_gap_m} m of any grid point; try a larger radius")
+        rows = []
+        t0 = time.time()
+        for k, (x, y) in enumerate(pts):
+            plon, plat = TO_LL.transform(x, y)
+            if not (BBOX[0] <= plon <= BBOX[2] and BBOX[1] <= plat <= BBOX[3]):
+                continue
+            res = self.predict_site(plat, plon)
+            p = res["probs"]["site"]
+            within = self.tree.query_ball_point([x, y], 1000)
+            rows.append({"lat": round(plat, 5), "lon": round(plon, 5), f"p {category}": p[c],
+                         "rank": int((p > p[c]).sum()) + 1, "most likely": self.classes[int(p.argmax())],
+                         f"{category} within 1 km": int((self.cat[within] == category).sum()),
+                         "POIs within 1 km": len(within), "town": res["town"], "town km": round(res["dist_town_km"], 1),
+                         "sub-district": res["adm2_pcode"]})
+            if progress:
+                print(f"\r  scored {k + 1}/{len(pts)} candidate sites ({time.time() - t0:.0f}s)", end="", flush=True)
+        if progress:
+            print()
+        out = pd.DataFrame(rows).sort_values(f"p {category}", ascending=False).reset_index(drop=True)
+        out.index += 1
+        return out.head(top), len(out), step
+
+    def gap_rows(self, area=None, adm2_pcode=None, only_flagged=False):
+        if self.gaps is None:
+            raise ValueError(f"{GAPS_CSV.name} not found: run gnn_location_model.ipynb (Section 9) first")
+        g = self.gaps
+        if adm2_pcode:
+            g = g[g["adm2_pcode"].eq(adm2_pcode)]
+        if area:
+            a = str(area).lower()
+            g = g[g["adm2_name"].str.lower().str.contains(a, regex=False) |
+                  g["adm1_name"].str.lower().str.contains(a, regex=False) | g["adm2_pcode"].str.lower().eq(a)]
+        if only_flagged:
+            g = g[g["signal"].ne("")]
+        return g
+
     # -- checks --------------------------------------------------------------------------------------------------------
-    def check(self, n_reinsert=5):
-        print("Check 1: rebuilding all 66 features of the 6,083 existing POIs ...")
+    def check(self, n_reinsert=3, n_site=30):
+        print(f"Check 1: rebuilding all {len(self.feats)} features of the {self.n:,} existing POIs ...")
         X, _ = engineer(self.base, self.feats)
-        diff = np.abs(X - self.eng[self.feats].to_numpy(np.float64))
+        diff = np.abs(X - self.X0)
         worst = pd.Series(diff.max(0), index=self.feats).sort_values(ascending=False)
         print(f"  largest difference from poi_engineered.csv: {worst.iloc[0]:.2e} ({worst.index[0]})")
         assert worst.iloc[0] < 5e-6, worst.head()
-        print("Check 2: out-of-fold predictions against model_outputs/oof_predictions.csv ...")
-        oof = pd.read_csv(HERE / "model_outputs" / "oof_predictions.csv")
-        P = np.array([self.predict_existing(i)["probs"] for i in oof["node_id"]])
-        d = np.abs(P - oof[[f"p_{c}" for c in self.classes]].to_numpy()).max()
-        agree = (np.array(self.classes)[P.argmax(1)] == oof["pred_raw"].to_numpy()).mean()
-        print(f"  largest probability difference {d:.1e} | same predicted class for {agree:.2%} of nodes")
-        assert d < 1e-3 and agree > 0.999
-        print(f"Check 3: remove {n_reinsert} POIs one at a time and add each back as a new POI ...")
-        oof_p = oof.set_index("node_id")[[f"p_{c}" for c in self.classes]]
+
+        print("Check 2: live predictions for every held-out fold against model_outputs_v2/oof_predictions.csv ...")
+        live = {m: np.full((self.n, self.C), np.nan) for m in MODES}
         rng = np.random.default_rng(0)
-        for i in rng.choice(np.flatnonzero(self.labelled), n_reinsert, replace=False):
+        for f in range(N_FOLDS):
+            te = np.flatnonzero(self.labelled & (self.fold == f))
+            live["known"][te] = self._score(self.X0, self.EI, self.XY, te, "known", [f])[f]
+            for grp in np.array_split(rng.permutation(te), 10):      # site mode: test nodes masked in 10 groups
+                live["site"][grp] = self._score(self.X0, self.EI, self.XY, grp, "site", [f])[f]
+        lab = np.flatnonzero(self.labelled)
+        for m in MODES:
+            st = self.stored[m].to_numpy()[lab]
+            lv = live[m][lab]
+            agree = (st.argmax(1) == lv.argmax(1)).mean()
+            f1 = lambda p: f1_score(self.y[lab], p.argmax(1), average="macro")
+            print(f"  {m:5s} mode: same predicted class for {agree:.1%} of nodes | mean probability difference "
+                  f"{np.abs(st - lv).mean():.3f} | macro-F1 live {f1(lv):.3f} vs notebook {f1(st):.3f}")
+            assert agree > 0.9 and abs(f1(lv) - f1(st)) < 0.02
+        print("  (the notebook adds label reuse and masks 10% of the other held-out nodes at once; both are small)")
+
+        print(f"Check 3: remove {n_reinsert} POIs one at a time and add each back as a new POI (known mode) ...")
+        for i in rng.choice(lab, n_reinsert, replace=False):
             r = self.base.loc[i]
-            sub = self._without(int(i))
-            res = sub.predict_new(r["lat"], r["lon"], r["has_name"], r["has_address"], r["has_hours"],
-                                  np.expm1(r["log_footprint_m2"]), r["is_point"], r["osm_id_rank"], r["adm2_pcode"])
-            dx = np.abs(res["x"] - self.eng.loc[i, self.feats].to_numpy(np.float64))
-            p_new = res["fold_probs"][int(r["fold"])]          # the models that never trained on this POI
-            dp = np.abs(p_new - oof_p.loc[i].to_numpy()).max()
+            res = self._without(int(i)).predict_new(r["lat"], r["lon"], r["has_name"], r["has_address"],
+                                                    r["has_hours"], np.expm1(r["log_footprint_m2"]), r["is_point"],
+                                                    r["osm_id_rank"], r["adm2_pcode"], folds=[int(r["fold"])])
+            dx = np.abs(res["x"] - self.X0[i])
+            dp = np.abs(res["probs"]["known"] - live["known"][i]).max()
             print(f"  node {i:4d} ({r['category']:15s}) largest feature difference {dx.max():.1e} "
-                  f"({self.feats[int(dx.argmax())]}) | largest probability difference {dp:.1e} | "
-                  f"class {self.classes[p_new.argmax()]} vs out-of-fold {self.classes[oof_p.loc[i].to_numpy().argmax()]}")
+                  f"({self.feats[int(dx.argmax())]}) | largest probability difference {dp:.1e}")
             assert dx.max() < 0.05 and dp < 1e-2      # 0.05: 0.1 m coordinate rounding at a 1-2 m spacing (log scale)
+
+        print(f"Check 4: remove {n_site} POIs one at a time and score each spot as a candidate site (site mode, "
+              "the models that never trained on it) ...")
+        rows = []
+        for i in rng.choice(lab, n_site, replace=False):
+            r = self.base.loc[i]
+            p = self._without(int(i)).predict_site(r["lat"], r["lon"], r["adm2_pcode"], folds=[int(r["fold"])])
+            p = p["probs"]["site"]
+            st = self.stored["site"].loc[i].to_numpy()
+            rows.append({"same class as notebook": p.argmax() == st.argmax(), "top-3 hit": self.y[i] in np.argsort(-p)[:3],
+                         "notebook top-3 hit": self.y[i] in np.argsort(-st)[:3], "diff": np.abs(p - st).max()})
+        rs = pd.DataFrame(rows)
+        print(f"  same predicted class as the notebook's site mode for {rs['same class as notebook'].mean():.0%} | "
+              f"true category in the top 3: {rs['top-3 hit'].mean():.0%} (notebook {rs['notebook top-3 hit'].mean():.0%})"
+              f" | median largest probability difference {rs['diff'].median():.3f}")
+        assert rs["same class as notebook"].mean() >= 0.7
         print("All checks passed.")
 
     def _without(self, i):
-        """A copy of the predictor whose existing graph lacks node i (for the reinsertion check)."""
+        """A copy of the predictor whose existing graph lacks node i (for the reinsertion checks)."""
         sub = copy.copy(self)
         keep = np.arange(self.n) != i
         b = self.base[keep].reset_index(drop=True)
@@ -520,23 +705,42 @@ class Predictor:
         b.loc[hit, "nn1_dist_m"] = dd[:, 1].round(1)
         b.loc[hit, "knn8_mean_dist_m"] = dd[:, 1:].mean(1).round(1)
         X, _ = engineer(b, self.feats)
-        sub._set_base(b, X[:, [self.feats.index(c) for c in self.rw_names]])
+        sub._set_base(b, X[:, [self.feats.index(c) for c in self.rw_names]], X)
         return sub
 
 
 # --------------------------------------------------------------------------------------------------------------------
 # Output and command line
 # --------------------------------------------------------------------------------------------------------------------
-def show(res, classes, class_f1, top=8):
-    p = res["probs"]
+def show(pred, res, top=8):
     print("\n" + res["title"])
     print("  " + res["context"])
-    order = np.argsort(p)[::-1][:top]
-    for j in order:
-        f1 = f"   (model test F1 for this class {class_f1[classes[j]]:.2f})" if classes[j] in class_f1 else ""
-        mark = "  <- true category" if res["true"] == classes[j] else ""
-        print(f"  {classes[j]:16s} {p[j]:6.1%}  {'#' * int(round(p[j] * 40)):40s}{f1 if j == order[0] else ''}{mark}")
-    print(f"  Predicted: {classes[order[0]]}" + (f" | true: {res['true']}" if res["true"] else "") + f" | {res['note']}")
+    for mode, p in res["probs"].items():
+        cm = pred.class_metrics.get(mode, {})
+        print(f"\n  {mode.upper()} MODE" + ("  (from the location and its neighbourhood only)" if mode == "site"
+                                           else "  (also uses how the POI itself is mapped)"))
+        print(f"  {'category':16s} {'prob':>6s}  {'':40s} {'test F1':>7s} {'top-3':>6s}")
+        order = np.argsort(p)[::-1][:top]
+        for j in order:
+            f1, t3 = cm.get(pred.classes[j], (np.nan, np.nan))
+            mark = "  <- true category" if res["true"] == pred.classes[j] else ""
+            print(f"  {pred.classes[j]:16s} {p[j]:6.1%}  {'#' * int(round(p[j] * 40)):40s} {f1:7.2f} {t3:6.2f}{mark}")
+        print(f"  Most likely: " + ", ".join(f"{pred.classes[j]} ({p[j]:.0%})" for j in order[:3]))
+    print(f"  ({res['note']}; 'test F1' and 'top-3' are the model's out-of-fold scores for that class in that mode.\n"
+          "   Training weights the small categories up, so their probabilities run high: read the ranking, not the "
+          "percentages, as odds.)")
+    if pred.gaps is not None and res.get("adm2_pcode"):
+        g = pred.gap_rows(adm2_pcode=res["adm2_pcode"], only_flagged=True)
+        if len(g):
+            print(f"\n  Market signals in this sub-district ({res['adm2_pcode']}), from {GAPS_CSV.name}:")
+            print_gaps(g, indent="  ")
+
+
+def print_gaps(g, indent=""):
+    cols = ["adm1_name", "adm2_name", "adm2_pcode", "category", "pois", "observed", "expected", "gap", "z", "signal",
+            "mapping"]
+    txt = g[[c for c in cols if c in g.columns]].to_string(index=False, float_format=lambda v: f"{v:.1f}")
+    print("\n".join(indent + line for line in txt.splitlines()))
 
 
 def ask(prompt, default=None, cast=str):
@@ -554,7 +758,18 @@ def yes(prompt, default="n"):
     return ask(f"{prompt} (y/n)", default).lower().startswith("y")
 
 
-def batch(pred, path, out, calibrated):
+def show_suggest(pred, category, lat, lon, radius_km, step_m, top):
+    print(f"\nBest candidate sites for {category} within {radius_km} km of ({lat}, {lon}), site mode:")
+    tab, n, step = pred.suggest(category, lat, lon, radius_km, step_m, top=top)
+    print(tab.to_string(float_format=lambda v: f"{v:.3f}"))
+    f1, t3 = pred.class_metrics.get("site", {}).get(category, (np.nan, np.nan))
+    print(f"  {n} grid points {step:.0f} m apart were scored. 'p {category}' is how strongly the location and its "
+          f"surroundings resemble where {category} POIs are mapped (site-mode test F1 for {category} {f1:.2f}, top-3 "
+          f"{t3:.2f}).\n  A high probability with few {category} POIs within 1 km is a candidate gap; a high "
+          "probability with many is an established cluster. Presence on the map is not proof of profitability.")
+
+
+def batch(pred, path, out, known):
     src = pd.read_csv(path)
     cols = {c.lower(): c for c in src.columns}
     if "lat" not in cols or "lon" not in cols:
@@ -562,14 +777,19 @@ def batch(pred, path, out, calibrated):
     get = lambda r, c, d: r[cols[c]] if c in cols and pd.notna(r[cols[c]]) else d
     rows = []
     for k, r in src.iterrows():
-        res = pred.predict_new(get(r, "lat", None), get(r, "lon", None), int(get(r, "has_name", 0)),
-                               int(get(r, "has_address", 0)), int(get(r, "has_hours", 0)),
-                               float(get(r, "footprint_m2", 0)),
-                               None if get(r, "is_point", None) is None else int(get(r, "is_point", None)),
-                               None if get(r, "osm_id_rank", None) is None else float(get(r, "osm_id_rank", None)),
-                               get(r, "adm2_pcode", None), calibrated)
-        p = res["probs"]
-        rows.append({"pred_category": pred.classes[p.argmax()], "pred_prob": round(float(p.max()), 4),
+        if known:
+            res = pred.predict_new(get(r, "lat", None), get(r, "lon", None), int(get(r, "has_name", 0)),
+                                   int(get(r, "has_address", 0)), int(get(r, "has_hours", 0)),
+                                   float(get(r, "footprint_m2", 0)),
+                                   None if get(r, "is_point", None) is None else int(get(r, "is_point", None)),
+                                   None if get(r, "osm_id_rank", None) is None else float(get(r, "osm_id_rank", None)),
+                                   get(r, "adm2_pcode", None))
+        else:
+            res = pred.predict_site(get(r, "lat", None), get(r, "lon", None), get(r, "adm2_pcode", None))
+        mode, p = next(iter(res["probs"].items()))
+        top3 = np.argsort(-p)[:3]
+        rows.append({"mode": mode, "pred_category": pred.classes[top3[0]], "pred_prob": round(float(p.max()), 4),
+                     "top3": "; ".join(pred.classes[j] for j in top3),
                      **{f"p_{c}": round(float(v), 4) for c, v in zip(pred.classes, p)}})
         print(f"  row {k + 1}/{len(src)}: {rows[-1]['pred_category']} ({rows[-1]['pred_prob']:.0%})")
     result = pd.concat([src, pd.DataFrame(rows)], axis=1)
@@ -577,31 +797,42 @@ def batch(pred, path, out, calibrated):
     print(f"Wrote {out} ({len(result)} rows)")
 
 
-def interactive(pred, calibrated):
-    print("\nWhat do you want to predict?")
+def interactive(pred):
+    print("\nWhat do you want to do?")
     while True:
-        print("\n  1  A new POI at a location (latitude, longitude and how it would be mapped)\n"
-              "  2  An existing POI (node_id, OSM id such as node/123, or part of its name)\n"
-              "  3  A CSV of new POIs (columns lat, lon; optional has_name, has_address, has_hours, footprint_m2, "
-              "is_point, osm_id_rank, adm2_pcode)\n"
-              f"  c  Switch calibrated class offsets {'off' if calibrated else 'on'} (now {'on' if calibrated else 'off'})\n"
+        print("\n  1  What does this location suit? (candidate site: latitude and longitude only)\n"
+              "  2  Where should a given business type go? (best spots for a category around a location)\n"
+              "  3  Market gaps of an area (sub-district or district name, or code such as LSA12)\n"
+              "  4  A new POI described as it would be mapped (name, address, hours, outline)\n"
+              "  5  An existing POI (node_id, OSM id such as node/123, or part of its name)\n"
+              "  6  A CSV of candidate sites (columns lat, lon; optional adm2_pcode)\n"
               "  q  Quit")
         try:
             choice = ask("Choice", "1").lower()
             if choice == "q":
                 return
-            if choice == "c":
-                calibrated = not calibrated
-            elif choice == "1":
+            if choice == "1":
+                lat = ask("  Latitude (e.g. -29.3151)", cast=float)
+                lon = ask("  Longitude (e.g. 27.4869)", cast=float)
+                show(pred, pred.predict_site(lat, lon))
+            elif choice == "2":
+                print("  Categories: " + ", ".join(pred.classes))
+                cat = ask("  Category", "Retail")
+                lat = ask("  Latitude of the centre (e.g. -29.3151)", cast=float)
+                lon = ask("  Longitude of the centre (e.g. 27.4869)", cast=float)
+                show_suggest(pred, cat, lat, lon, ask("  Radius in km", 2.0, float), None, ask("  How many", 10, int))
+            elif choice == "3":
+                g = pred.gap_rows(ask("  Area"), only_flagged=yes("  Only the flagged gaps and clusters?", "y"))
+                print_gaps(g) if len(g) else print("  nothing found")
+            elif choice == "4":
                 lat = ask("  Latitude (e.g. -29.3151)", cast=float)
                 lon = ask("  Longitude (e.g. 27.4869)", cast=float)
                 has_name = yes("  Has a name?", "y")
                 has_address = yes("  Has an address?")
                 has_hours = yes("  Has opening hours?")
                 fp = ask("  Building outline area in m2 (0 = mapped as a point only)", 0.0, float)
-                show(pred.predict_new(lat, lon, has_name, has_address, has_hours, fp, calibrated=calibrated),
-                     pred.classes, pred.class_f1)
-            elif choice == "2":
+                show(pred, pred.predict_new(lat, lon, has_name, has_address, has_hours, fp))
+            elif choice == "5":
                 hits = pred.find(ask("  node_id, OSM id or name"))
                 if not hits:
                     print("  no POI found")
@@ -612,11 +843,11 @@ def interactive(pred, calibrated):
                         print(f"   {j + 1:2d}. node {i} {r['osm_id']:22s} {r['name']} ({r['category']}, {r['adm2_name']})")
                     sel = ask("  Which one", 1, int)
                     hits = [hits[min(max(sel, 1), min(len(hits), 15)) - 1]]
-                show(pred.predict_existing(hits[0], calibrated), pred.classes, pred.class_f1)
-            elif choice == "3":
+                show(pred, pred.predict_existing(hits[0]))
+            elif choice == "6":
                 path = ask("  Input CSV path")
                 batch(pred, path, ask("  Output CSV path", str(Path(path).with_name(Path(path).stem + "_predictions.csv"))),
-                      calibrated)
+                      known=False)
             else:
                 print(f"  unknown choice {choice!r}")
         except (ValueError, OSError) as e:
@@ -628,11 +859,23 @@ def interactive(pred, calibrated):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("--calibrated", action="store_true", help="apply the validation-fitted class offsets "
-                    "(model.ipynb Section 5; they did not improve the test score, so they are off by default)")
     ap.add_argument("--check", action="store_true", help="verify features and predictions against the notebook")
     sub = ap.add_subparsers(dest="mode")
-    n = sub.add_parser("new", help="predict a new POI at a location")
+    s = sub.add_parser("site", help="what a candidate location suits (site mode)")
+    s.add_argument("--lat", type=float, required=True)
+    s.add_argument("--lon", type=float, required=True)
+    s.add_argument("--adm2-pcode", help="sub-district code, e.g. LSA12; default: that of the nearest POI")
+    g = sub.add_parser("suggest", help="best candidate sites for a category around a location (site mode)")
+    g.add_argument("--category", required=True)
+    g.add_argument("--lat", type=float, required=True)
+    g.add_argument("--lon", type=float, required=True)
+    g.add_argument("--radius-km", type=float, default=2.0)
+    g.add_argument("--step-m", type=float, help="grid spacing; default: about 49 points in the circle")
+    g.add_argument("--top", type=int, default=10)
+    m = sub.add_parser("gaps", help="market gaps and clusters per sub-district (from the notebook)")
+    m.add_argument("--area", help="part of a sub-district or district name, or a code such as LSA12")
+    m.add_argument("--all", action="store_true", help="show every category, not only the flagged ones")
+    n = sub.add_parser("new", help="a new POI described as it would be mapped (known mode)")
     n.add_argument("--lat", type=float, required=True)
     n.add_argument("--lon", type=float, required=True)
     n.add_argument("--name", action="store_true", help="the POI has a name")
@@ -642,10 +885,11 @@ def main():
     n.add_argument("--also-point", action="store_true", help="mapped as a point as well as an outline")
     n.add_argument("--osm-id-rank", type=float, help="0-1 mapping-date rank; default: that of its surroundings")
     n.add_argument("--adm2-pcode", help="sub-district code, e.g. LSA12; default: that of the nearest POI")
-    e = sub.add_parser("existing", help="predict an existing POI")
+    e = sub.add_parser("existing", help="the notebook's predictions for an existing POI (both modes)")
     e.add_argument("--query", required=True, help="node_id, OSM id (node/123, way/456) or part of a name")
-    b = sub.add_parser("batch", help="predict every row of a CSV of new POIs")
+    b = sub.add_parser("batch", help="score every row of a CSV (candidate sites, or new POIs with --known)")
     b.add_argument("csv")
+    b.add_argument("--known", action="store_true", help="rows describe mapped POIs (has_name, ...): known mode")
     b.add_argument("--out", help="output CSV (default: <input>_predictions.csv)")
     args = ap.parse_args()
 
@@ -660,22 +904,29 @@ def main():
 def run(pred, args):
     if args.check:
         pred.check()
+    elif args.mode == "site":
+        show(pred, pred.predict_site(args.lat, args.lon, args.adm2_pcode))
+    elif args.mode == "suggest":
+        show_suggest(pred, args.category, args.lat, args.lon, args.radius_km, args.step_m, args.top)
+    elif args.mode == "gaps":
+        g = pred.gap_rows(args.area, only_flagged=not args.all)
+        print_gaps(g) if len(g) else print("Nothing found.")
     elif args.mode == "new":
         is_point = 1 if (args.also_point or args.footprint_m2 <= 0) else 0
-        show(pred.predict_new(args.lat, args.lon, args.name, args.address, args.hours, args.footprint_m2, is_point,
-                              args.osm_id_rank, args.adm2_pcode, args.calibrated), pred.classes, pred.class_f1)
+        show(pred, pred.predict_new(args.lat, args.lon, args.name, args.address, args.hours, args.footprint_m2,
+                                    is_point, args.osm_id_rank, args.adm2_pcode))
     elif args.mode == "existing":
         hits = pred.find(args.query)
         if not hits:
             sys.exit(f"No POI matches {args.query!r}")
         if len(hits) > 1:
             print(f"{len(hits)} POIs match; showing the first. Use a node_id or OSM id to pick another.")
-        show(pred.predict_existing(hits[0], args.calibrated), pred.classes, pred.class_f1)
+        show(pred, pred.predict_existing(hits[0]))
     elif args.mode == "batch":
         batch(pred, args.csv, args.out or str(Path(args.csv).with_name(Path(args.csv).stem + "_predictions.csv")),
-              args.calibrated)
+              args.known)
     else:
-        interactive(pred, args.calibrated)
+        interactive(pred)
 
 
 if __name__ == "__main__":

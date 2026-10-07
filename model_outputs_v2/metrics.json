@@ -1,0 +1,1987 @@
+{
+ "architecture_comparison": [
+  {
+   "run": "sage",
+   "reuse": "no reuse",
+   "val known": 0.367,
+   "val site": 0.263,
+   "val score": 0.315,
+   "test known": 0.346,
+   "SD k": 0.012,
+   "test site": 0.247,
+   "SD s": 0.021,
+   "acc known": 0.594,
+   "acc site": 0.45,
+   "top3 known": 0.841,
+   "top3 site": 0.751,
+   "epochs": 86.0,
+   "min": 3.906
+  },
+  {
+   "run": "gcn",
+   "reuse": "reuse 1x t.9",
+   "val known": 0.367,
+   "val site": 0.257,
+   "val score": 0.312,
+   "test known": 0.352,
+   "SD k": 0.025,
+   "test site": 0.246,
+   "SD s": 0.023,
+   "acc known": 0.592,
+   "acc site": 0.439,
+   "top3 known": 0.835,
+   "top3 site": 0.742,
+   "epochs": 78.0,
+   "min": 4.291
+  },
+  {
+   "run": "gat",
+   "reuse": "reuse 2x t.7",
+   "val known": 0.372,
+   "val site": 0.254,
+   "val score": 0.313,
+   "test known": 0.351,
+   "SD k": 0.017,
+   "test site": 0.253,
+   "SD s": 0.012,
+   "acc known": 0.587,
+   "acc site": 0.443,
+   "top3 known": 0.838,
+   "top3 site": 0.747,
+   "epochs": 84.0,
+   "min": 16.692
+  }
+ ],
+ "selected_architecture": "sage",
+ "tuning": [
+  {
+   "run": "tune05",
+   "config": "{\"hidden\": 128, \"layers\": 2, \"dropout\": 0.5, \"lr\": 0.01, \"weight_decay\": 0.05, \"cw_power\": 0.75, \"mask_rate\": 0.3, \"label_rate\": [0.1, 0.9], \"dist_scale\": 250}",
+   "reuse": "reuse 1x t.9",
+   "val known": 0.377,
+   "val site": 0.262,
+   "val score": 0.32,
+   "test known": 0.349,
+   "SD k": 0.039,
+   "test site": 0.241,
+   "SD s": 0.035,
+   "acc known": 0.547,
+   "acc site": 0.373,
+   "top3 known": 0.827,
+   "top3 site": 0.713,
+   "epochs": 63.0,
+   "min": 8.109
+  },
+  {
+   "run": "tune00",
+   "config": "{\"hidden\": 64, \"layers\": 3, \"dropout\": 0.5, \"lr\": 0.005, \"weight_decay\": 0.005, \"cw_power\": 0.75, \"mask_rate\": 0.3, \"label_rate\": [0.0, 0.5], \"dist_scale\": null}",
+   "reuse": "reuse 1x t.5",
+   "val known": 0.368,
+   "val site": 0.263,
+   "val score": 0.316,
+   "test known": 0.348,
+   "SD k": 0.031,
+   "test site": 0.246,
+   "SD s": 0.031,
+   "acc known": 0.557,
+   "acc site": 0.395,
+   "top3 known": 0.819,
+   "top3 site": 0.706,
+   "epochs": 69.0,
+   "min": 5.256
+  },
+  {
+   "run": "sage-base",
+   "config": "{\"hidden\": 64, \"layers\": 2, \"dropout\": 0.5, \"lr\": 0.01, \"weight_decay\": 0.05, \"cw_power\": 0.5, \"mask_rate\": 0.5, \"label_rate\": [0.1, 0.9], \"dist_scale\": 1000}",
+   "reuse": "no reuse",
+   "val known": 0.367,
+   "val site": 0.263,
+   "val score": 0.315,
+   "test known": 0.346,
+   "SD k": 0.012,
+   "test site": 0.247,
+   "SD s": 0.021,
+   "acc known": 0.594,
+   "acc site": 0.45,
+   "top3 known": 0.841,
+   "top3 site": 0.751,
+   "epochs": 86.0,
+   "min": 3.906
+  },
+  {
+   "run": "tune10",
+   "config": "{\"hidden\": 64, \"layers\": 3, \"dropout\": 0.5, \"lr\": 0.005, \"weight_decay\": 0.05, \"cw_power\": 0.5, \"mask_rate\": 0.3, \"label_rate\": [0.0, 0.5], \"dist_scale\": 1000}",
+   "reuse": "reuse 1x t.5",
+   "val known": 0.374,
+   "val site": 0.256,
+   "val score": 0.315,
+   "test known": 0.356,
+   "SD k": 0.023,
+   "test site": 0.251,
+   "SD s": 0.021,
+   "acc known": 0.598,
+   "acc site": 0.438,
+   "top3 known": 0.835,
+   "top3 site": 0.742,
+   "epochs": 89.0,
+   "min": 5.929
+  },
+  {
+   "run": "tune01",
+   "config": "{\"hidden\": 64, \"layers\": 2, \"dropout\": 0.5, \"lr\": 0.01, \"weight_decay\": 0.05, \"cw_power\": 0.75, \"mask_rate\": 0.7, \"label_rate\": [0.0, 0.5], \"dist_scale\": null}",
+   "reuse": "reuse 1x t.9",
+   "val known": 0.361,
+   "val site": 0.267,
+   "val score": 0.314,
+   "test known": 0.336,
+   "SD k": 0.037,
+   "test site": 0.255,
+   "SD s": 0.031,
+   "acc known": 0.542,
+   "acc site": 0.402,
+   "top3 known": 0.806,
+   "top3 site": 0.709,
+   "epochs": 52.0,
+   "min": 3.506
+  },
+  {
+   "run": "tune06",
+   "config": "{\"hidden\": 64, \"layers\": 1, \"dropout\": 0.5, \"lr\": 0.005, \"weight_decay\": 0.05, \"cw_power\": 0.75, \"mask_rate\": 0.7, \"label_rate\": [0.0, 0.5], \"dist_scale\": 250}",
+   "reuse": "reuse 1x t.7",
+   "val known": 0.358,
+   "val site": 0.27,
+   "val score": 0.314,
+   "test known": 0.34,
+   "SD k": 0.033,
+   "test site": 0.251,
+   "SD s": 0.017,
+   "acc known": 0.545,
+   "acc site": 0.407,
+   "top3 known": 0.813,
+   "top3 site": 0.725,
+   "epochs": 69.0,
+   "min": 2.253
+  },
+  {
+   "run": "tune08",
+   "config": "{\"hidden\": 64, \"layers\": 1, \"dropout\": 0.5, \"lr\": 0.005, \"weight_decay\": 0.005, \"cw_power\": 0.5, \"mask_rate\": 0.5, \"label_rate\": [0.0, 0.5], \"dist_scale\": 3000}",
+   "reuse": "reuse 1x t.5",
+   "val known": 0.367,
+   "val site": 0.259,
+   "val score": 0.313,
+   "test known": 0.341,
+   "SD k": 0.023,
+   "test site": 0.244,
+   "SD s": 0.024,
+   "acc known": 0.601,
+   "acc site": 0.452,
+   "top3 known": 0.84,
+   "top3 site": 0.751,
+   "epochs": 91.0,
+   "min": 2.637
+  },
+  {
+   "run": "tune09",
+   "config": "{\"hidden\": 64, \"layers\": 1, \"dropout\": 0.5, \"lr\": 0.01, \"weight_decay\": 0.05, \"cw_power\": 0.5, \"mask_rate\": 0.3, \"label_rate\": [0.0, 0.5], \"dist_scale\": 3000}",
+   "reuse": "no reuse",
+   "val known": 0.375,
+   "val site": 0.251,
+   "val score": 0.313,
+   "test known": 0.357,
+   "SD k": 0.013,
+   "test site": 0.248,
+   "SD s": 0.018,
+   "acc known": 0.615,
+   "acc site": 0.458,
+   "top3 known": 0.852,
+   "top3 site": 0.75,
+   "epochs": 73.0,
+   "min": 2.253
+  },
+  {
+   "run": "tune03",
+   "config": "{\"hidden\": 128, \"layers\": 2, \"dropout\": 0.3, \"lr\": 0.005, \"weight_decay\": 0.005, \"cw_power\": 0.5, \"mask_rate\": 0.5, \"label_rate\": [0.0, 0.5], \"dist_scale\": null}",
+   "reuse": "no reuse",
+   "val known": 0.374,
+   "val site": 0.25,
+   "val score": 0.312,
+   "test known": 0.349,
+   "SD k": 0.025,
+   "test site": 0.242,
+   "SD s": 0.023,
+   "acc known": 0.576,
+   "acc site": 0.419,
+   "top3 known": 0.829,
+   "top3 site": 0.73,
+   "epochs": 53.0,
+   "min": 7.835
+  },
+  {
+   "run": "tune07",
+   "config": "{\"hidden\": 128, \"layers\": 2, \"dropout\": 0.3, \"lr\": 0.01, \"weight_decay\": 0.005, \"cw_power\": 0.5, \"mask_rate\": 0.5, \"label_rate\": [0.0, 0.5], \"dist_scale\": null}",
+   "reuse": "no reuse",
+   "val known": 0.371,
+   "val site": 0.252,
+   "val score": 0.311,
+   "test known": 0.349,
+   "SD k": 0.032,
+   "test site": 0.237,
+   "SD s": 0.028,
+   "acc known": 0.572,
+   "acc site": 0.416,
+   "top3 known": 0.829,
+   "top3 site": 0.728,
+   "epochs": 84.0,
+   "min": 8.188
+  },
+  {
+   "run": "tune02",
+   "config": "{\"hidden\": 128, \"layers\": 2, \"dropout\": 0.5, \"lr\": 0.005, \"weight_decay\": 0.005, \"cw_power\": 0.75, \"mask_rate\": 0.7, \"label_rate\": [0.0, 0.5], \"dist_scale\": 250}",
+   "reuse": "reuse 1x t.5",
+   "val known": 0.353,
+   "val site": 0.264,
+   "val score": 0.308,
+   "test known": 0.338,
+   "SD k": 0.039,
+   "test site": 0.254,
+   "SD s": 0.033,
+   "acc known": 0.539,
+   "acc site": 0.399,
+   "top3 known": 0.805,
+   "top3 site": 0.717,
+   "epochs": 59.0,
+   "min": 7.164
+  },
+  {
+   "run": "tune11",
+   "config": "{\"hidden\": 64, \"layers\": 3, \"dropout\": 0.3, \"lr\": 0.01, \"weight_decay\": 0.005, \"cw_power\": 0.75, \"mask_rate\": 0.7, \"label_rate\": [0.0, 0.5], \"dist_scale\": 1000}",
+   "reuse": "reuse 1x t.5",
+   "val known": 0.358,
+   "val site": 0.258,
+   "val score": 0.308,
+   "test known": 0.338,
+   "SD k": 0.033,
+   "test site": 0.248,
+   "SD s": 0.028,
+   "acc known": 0.542,
+   "acc site": 0.389,
+   "top3 known": 0.805,
+   "top3 site": 0.712,
+   "epochs": 57.0,
+   "min": 4.631
+  },
+  {
+   "run": "tune04",
+   "config": "{\"hidden\": 128, \"layers\": 3, \"dropout\": 0.3, \"lr\": 0.01, \"weight_decay\": 0.005, \"cw_power\": 0.75, \"mask_rate\": 0.7, \"label_rate\": [0.1, 0.9], \"dist_scale\": null}",
+   "reuse": "reuse 1x t.5",
+   "val known": 0.357,
+   "val site": 0.255,
+   "val score": 0.306,
+   "test known": 0.333,
+   "SD k": 0.023,
+   "test site": 0.246,
+   "SD s": 0.021,
+   "acc known": 0.538,
+   "acc site": 0.401,
+   "top3 known": 0.807,
+   "top3 site": 0.71,
+   "epochs": 54.0,
+   "min": 12.154
+  }
+ ],
+ "selected_config": {
+  "conv": "sage",
+  "hidden": 128,
+  "layers": 2,
+  "heads": 4,
+  "dropout": 0.5,
+  "input_dropout": 0.0,
+  "attn_dropout": 0.1,
+  "label_input": true,
+  "label_rate": [
+   0.1,
+   0.9
+  ],
+  "mask_rate": 0.3,
+  "dist_scale": 250,
+  "lr": 0.01,
+  "weight_decay": 0.05,
+  "cw_power": 0.75,
+  "smoothing": 0.05,
+  "max_epochs": 300,
+  "patience": 50
+ },
+ "final": {
+  "reuse_setting": "reuse 1x t.5",
+  "reuse_table": [
+   {
+    "setting": "no reuse",
+    "val known": 0.3767089528,
+    "val site": 0.2637834489,
+    "val score": 0.3202462008,
+    "test known": 0.3554765178,
+    "SD known": 0.0413605412,
+    "test site": 0.2491876772,
+    "SD site": 0.0367516781,
+    "acc known": 0.5504032258,
+    "acc site": 0.3887768817,
+    "top3 known": 0.8271169355,
+    "top3 site": 0.716733871
+   },
+   {
+    "setting": "reuse 1x t.5",
+    "val known": 0.3765401672,
+    "val site": 0.2659650311,
+    "val score": 0.3212525991,
+    "test known": 0.3564743178,
+    "SD known": 0.0393252614,
+    "test site": 0.2451408828,
+    "SD site": 0.0361015537,
+    "acc known": 0.5519153226,
+    "acc site": 0.3884408602,
+    "top3 known": 0.8257728495,
+    "top3 site": 0.7175739247
+   },
+   {
+    "setting": "reuse 1x t.7",
+    "val known": 0.3758888736,
+    "val site": 0.2652295975,
+    "val score": 0.3205592356,
+    "test known": 0.355105074,
+    "SD known": 0.0409222355,
+    "test site": 0.2459500599,
+    "SD site": 0.0362457224,
+    "acc known": 0.5517473118,
+    "acc site": 0.3865927419,
+    "top3 known": 0.827452957,
+    "top3 site": 0.7170698925
+   },
+   {
+    "setting": "reuse 1x t.9",
+    "val known": 0.3763643517,
+    "val site": 0.2634335078,
+    "val score": 0.3198989298,
+    "test known": 0.355873834,
+    "SD known": 0.0414243904,
+    "test site": 0.2484318795,
+    "SD site": 0.0381426685,
+    "acc known": 0.5507392473,
+    "acc site": 0.3881048387,
+    "top3 known": 0.827452957,
+    "top3 site": 0.717405914
+   },
+   {
+    "setting": "reuse 2x t.7",
+    "val known": 0.3755862502,
+    "val site": 0.2651018734,
+    "val score": 0.3203440618,
+    "test known": 0.3557113468,
+    "SD known": 0.0412597101,
+    "test site": 0.2455992234,
+    "SD site": 0.0361011993,
+    "acc known": 0.5510752688,
+    "acc site": 0.3862567204,
+    "top3 known": 0.827452957,
+    "top3 site": 0.7163978495
+   }
+  ],
+  "per_fold": [
+   {
+    "test fold": 0,
+    "test nodes": 1182.0,
+    "F1 known": 0.3879654258,
+    "F1 site": 0.2612109944
+   },
+   {
+    "test fold": 1,
+    "test nodes": 1198.0,
+    "F1 known": 0.3600519495,
+    "F1 site": 0.2514794997
+   },
+   {
+    "test fold": 2,
+    "test nodes": 1183.0,
+    "F1 known": 0.3716022889,
+    "F1 site": 0.255134214
+   },
+   {
+    "test fold": 3,
+    "test nodes": 1208.0,
+    "F1 known": 0.3825578986,
+    "F1 site": 0.2818235505
+   },
+   {
+    "test fold": 4,
+    "test nodes": 1181.0,
+    "F1 known": 0.2801940262,
+    "F1 site": 0.1760561553
+   },
+   {
+    "test fold": "mean",
+    "test nodes": 1190.4,
+    "F1 known": 0.3564743178,
+    "F1 site": 0.2451408828
+   },
+   {
+    "test fold": "SD",
+    "test nodes": 10.7814655776,
+    "F1 known": 0.0393252614,
+    "F1 site": 0.0361015537
+   }
+  ],
+  "pooled": [
+   {
+    "index": 0,
+    "mode": "known",
+    "macro-F1 pooled": 0.3596289208,
+    "accuracy": 0.5519153226,
+    "top-2": 0.7150537634,
+    "top-3": 0.8257728495,
+    "ECE raw": 0.0383542296,
+    "ECE scaled": 0.0381109385,
+    "log loss raw": 1.3354408618,
+    "log loss scaled": 1.3151630107,
+    "T median": 0.8705505633,
+    "T range": "0.73-1.32"
+   },
+   {
+    "index": 1,
+    "mode": "site",
+    "macro-F1 pooled": 0.2545742259,
+    "accuracy": 0.3884408602,
+    "top-2": 0.5967741935,
+    "top-3": 0.7175739247,
+    "ECE raw": 0.0323452315,
+    "ECE scaled": 0.036354889,
+    "log loss raw": 1.7646033966,
+    "log loss scaled": 1.7391987387,
+    "T median": 0.9659363289,
+    "T range": "0.73-1.57"
+   }
+  ],
+  "per_class": {
+   "known": [
+    {
+     "index": "Infrastructure",
+     "precision": 0.7396593674,
+     "recall": 0.6785714286,
+     "F1": 0.7077997672,
+     "top-3": 0.8688616071
+    },
+    {
+     "index": "Educational",
+     "precision": 0.8519417476,
+     "recall": 0.8427370948,
+     "F1": 0.8473144237,
+     "top-3": 0.9225690276
+    },
+    {
+     "index": "Retail",
+     "precision": 0.476744186,
+     "recall": 0.3124470787,
+     "F1": 0.3774936061,
+     "top-3": 0.850127011
+    },
+    {
+     "index": "Other",
+     "precision": 0.1629213483,
+     "recall": 0.1736526946,
+     "F1": 0.168115942,
+     "top-3": 0.505988024
+    },
+    {
+     "index": "Food & Beverage",
+     "precision": 0.1343283582,
+     "recall": 0.2150170648,
+     "F1": 0.1653543307,
+     "top-3": 0.7030716724
+    },
+    {
+     "index": "Tourism",
+     "precision": 0.1873111782,
+     "recall": 0.246031746,
+     "F1": 0.2126929674,
+     "top-3": 0.5912698413
+    },
+    {
+     "index": "Religious",
+     "precision": 0.2664576803,
+     "recall": 0.3601694915,
+     "F1": 0.3063063063,
+     "top-3": 0.7203389831
+    },
+    {
+     "index": "Healthcare",
+     "precision": 0.0681265207,
+     "recall": 0.1414141414,
+     "F1": 0.091954023,
+     "top-3": 0.6212121212
+    }
+   ],
+   "site": [
+    {
+     "index": "Infrastructure",
+     "precision": 0.5151515152,
+     "recall": 0.3604910714,
+     "F1": 0.4241628365,
+     "top-3": 0.7405133929
+    },
+    {
+     "index": "Educational",
+     "precision": 0.6197788698,
+     "recall": 0.6056422569,
+     "F1": 0.6126290225,
+     "top-3": 0.8055222089
+    },
+    {
+     "index": "Retail",
+     "precision": 0.4530332681,
+     "recall": 0.3920406435,
+     "F1": 0.4203359056,
+     "top-3": 0.8035563082
+    },
+    {
+     "index": "Other",
+     "precision": 0.1203703704,
+     "recall": 0.1556886228,
+     "F1": 0.135770235,
+     "top-3": 0.4850299401
+    },
+    {
+     "index": "Food & Beverage",
+     "precision": 0.0690607735,
+     "recall": 0.0853242321,
+     "F1": 0.0763358779,
+     "top-3": 0.5597269625
+    },
+    {
+     "index": "Tourism",
+     "precision": 0.1459459459,
+     "recall": 0.2142857143,
+     "F1": 0.1736334405,
+     "top-3": 0.4761904762
+    },
+    {
+     "index": "Religious",
+     "precision": 0.094488189,
+     "recall": 0.1525423729,
+     "F1": 0.1166936791,
+     "top-3": 0.5127118644
+    },
+    {
+     "index": "Healthcare",
+     "precision": 0.0536779324,
+     "recall": 0.1363636364,
+     "F1": 0.0770328103,
+     "top-3": 0.4343434343
+    }
+   ]
+  }
+ },
+ "ablations": [
+  {
+   "ablation": "reference (selected config)",
+   "features": 66,
+   "val known": 0.377,
+   "val site": 0.262,
+   "test known": 0.349,
+   "d known": 0.0,
+   "test site": 0.241,
+   "d site": 0.0,
+   "top3 site": 0.713,
+   "site f0": 0.255,
+   "site f1": 0.251,
+   "site f2": 0.239,
+   "site f3": 0.283,
+   "site f4": 0.177
+  },
+  {
+   "ablation": "graph off",
+   "features": 66,
+   "val known": 0.376,
+   "val site": 0.247,
+   "test known": 0.356,
+   "d known": 0.007,
+   "test site": 0.24,
+   "d site": -0.001,
+   "top3 site": 0.71,
+   "site f0": 0.255,
+   "site f1": 0.239,
+   "site f2": 0.246,
+   "site f3": 0.253,
+   "site f4": 0.208
+  },
+  {
+   "ablation": "neighbour labels off",
+   "features": 66,
+   "val known": 0.376,
+   "val site": 0.252,
+   "test known": 0.358,
+   "d known": 0.009,
+   "test site": 0.242,
+   "d site": 0.001,
+   "top3 site": 0.716,
+   "site f0": 0.271,
+   "site f1": 0.254,
+   "site f2": 0.255,
+   "site f3": 0.262,
+   "site f4": 0.17
+  },
+  {
+   "ablation": "neighbour labels only",
+   "features": 0,
+   "val known": 0.106,
+   "val site": 0.106,
+   "test known": 0.097,
+   "d known": -0.252,
+   "test site": 0.095,
+   "d site": -0.146,
+   "top3 site": 0.63,
+   "site f0": 0.112,
+   "site f1": 0.094,
+   "site f2": 0.11,
+   "site f3": 0.093,
+   "site f4": 0.065
+  },
+  {
+   "ablation": "mask rate 0",
+   "features": 66,
+   "val known": 0.367,
+   "val site": 0.236,
+   "test known": 0.348,
+   "d known": -0.002,
+   "test site": 0.23,
+   "d site": -0.011,
+   "top3 site": 0.684,
+   "site f0": 0.227,
+   "site f1": 0.237,
+   "site f2": 0.249,
+   "site f3": 0.241,
+   "site f4": 0.195
+  },
+  {
+   "ablation": "mask rate 0.5",
+   "features": 66,
+   "val known": 0.368,
+   "val site": 0.264,
+   "test known": 0.349,
+   "d known": 0.0,
+   "test site": 0.257,
+   "d site": 0.016,
+   "top3 site": 0.718,
+   "site f0": 0.262,
+   "site f1": 0.266,
+   "site f2": 0.256,
+   "site f3": 0.294,
+   "site f4": 0.207
+  },
+  {
+   "ablation": "mask rate 0.7",
+   "features": 66,
+   "val known": 0.358,
+   "val site": 0.266,
+   "test known": 0.337,
+   "d known": -0.012,
+   "test site": 0.248,
+   "d site": 0.007,
+   "top3 site": 0.723,
+   "site f0": 0.252,
+   "site f1": 0.256,
+   "site f2": 0.263,
+   "site f3": 0.284,
+   "site f4": 0.186
+  },
+  {
+   "ablation": "mask rate 1",
+   "features": 66,
+   "val known": 0.264,
+   "val site": 0.266,
+   "test known": 0.246,
+   "d known": -0.104,
+   "test site": 0.242,
+   "d site": 0.001,
+   "top3 site": 0.715,
+   "site f0": 0.25,
+   "site f1": 0.247,
+   "site f2": 0.255,
+   "site f3": 0.251,
+   "site f4": 0.207
+  },
+  {
+   "ablation": "no osm_id_rank",
+   "features": 62,
+   "val known": 0.369,
+   "val site": 0.258,
+   "test known": 0.356,
+   "d known": 0.007,
+   "test site": 0.254,
+   "d site": 0.013,
+   "top3 site": 0.715,
+   "site f0": 0.264,
+   "site f1": 0.266,
+   "site f2": 0.251,
+   "site f3": 0.289,
+   "site f4": 0.198
+  },
+  {
+   "ablation": "buffered CV (700 m)",
+   "features": 66,
+   "val known": 0.366,
+   "val site": 0.258,
+   "test known": 0.351,
+   "d known": 0.002,
+   "test site": 0.249,
+   "d site": 0.008,
+   "top3 site": 0.718,
+   "site f0": 0.263,
+   "site f1": 0.265,
+   "site f2": 0.261,
+   "site f3": 0.268,
+   "site f4": 0.188
+  },
+  {
+   "ablation": "local features only, graph on",
+   "features": 20,
+   "val known": 0.374,
+   "val site": 0.222,
+   "test known": 0.363,
+   "d known": 0.014,
+   "test site": 0.218,
+   "d site": -0.023,
+   "top3 site": 0.684,
+   "site f0": 0.242,
+   "site f1": 0.232,
+   "site f2": 0.187,
+   "site f3": 0.251,
+   "site f4": 0.176
+  },
+  {
+   "ablation": "local features only, graph off",
+   "features": 20,
+   "val known": 0.34,
+   "val site": 0.148,
+   "test known": 0.326,
+   "d known": -0.024,
+   "test site": 0.14,
+   "d site": -0.101,
+   "top3 site": 0.664,
+   "site f0": 0.178,
+   "site f1": 0.141,
+   "site f2": 0.103,
+   "site f3": 0.148,
+   "site f4": 0.13
+  }
+ ],
+ "ro2_permutation_importance": [
+  {
+   "unit": "group: loc_",
+   "d_log_loss": 0.31174,
+   "sd": 0.18823,
+   "d_F1": -0.09275
+  },
+  {
+   "unit": "loc_log_density_100m",
+   "d_log_loss": 0.04333,
+   "sd": 0.02396,
+   "d_F1": -0.00726
+  },
+  {
+   "unit": "loc_log_knn16_dist_m",
+   "d_log_loss": 0.02886,
+   "sd": 0.02909,
+   "d_F1": 0.00042
+  },
+  {
+   "unit": "loc_log_knn8_mean_dist_m",
+   "d_log_loss": 0.02713,
+   "sd": 0.01588,
+   "d_F1": -0.00351
+  },
+  {
+   "unit": "loc_log_density_2km",
+   "d_log_loss": 0.02286,
+   "sd": 0.00728,
+   "d_F1": -0.00202
+  },
+  {
+   "unit": "loc_log_nn1_dist_m",
+   "d_log_loss": 0.0217,
+   "sd": 0.04589,
+   "d_F1": -0.0049
+  },
+  {
+   "unit": "loc_log_density_250m",
+   "d_log_loss": 0.01961,
+   "sd": 0.01146,
+   "d_F1": 0.00029
+  },
+  {
+   "unit": "adm_adm2_urban_share",
+   "d_log_loss": 0.01194,
+   "sd": 0.00965,
+   "d_F1": -0.00103
+  },
+  {
+   "unit": "ctx_named_share_k32",
+   "d_log_loss": 0.01142,
+   "sd": 0.03141,
+   "d_F1": -0.00029
+  },
+  {
+   "unit": "group: struct_",
+   "d_log_loss": 0.00907,
+   "sd": 0.01719,
+   "d_F1": -0.00874
+  },
+  {
+   "unit": "loc_log_density_5km",
+   "d_log_loss": 0.008,
+   "sd": 0.01056,
+   "d_F1": 0.00341
+  },
+  {
+   "unit": "loc_log_latrines_1km",
+   "d_log_loss": 0.00737,
+   "sd": 0.00942,
+   "d_F1": 0.00119
+  },
+  {
+   "unit": "struct_knn8_reciprocity",
+   "d_log_loss": 0.00594,
+   "sd": 0.00623,
+   "d_F1": -0.0004
+  },
+  {
+   "unit": "loc_y_km",
+   "d_log_loss": 0.00476,
+   "sd": 0.00395,
+   "d_F1": -0.00025
+  },
+  {
+   "unit": "struct_rwse_02",
+   "d_log_loss": 0.00453,
+   "sd": 0.00828,
+   "d_F1": -0.00129
+  },
+  {
+   "unit": "struct_knn8_clustering",
+   "d_log_loss": 0.0043,
+   "sd": 0.0052,
+   "d_F1": -0.0018
+  },
+  {
+   "unit": "loc_shape_offset_k32",
+   "d_log_loss": 0.00359,
+   "sd": 0.00241,
+   "d_F1": -0.00134
+  },
+  {
+   "unit": "loc_shape_gap_k32",
+   "d_log_loss": 0.00314,
+   "sd": 0.00356,
+   "d_F1": -0.00491
+  },
+  {
+   "unit": "loc_log_town_rel_dist",
+   "d_log_loss": 0.00284,
+   "sd": 0.01845,
+   "d_F1": 0.00241
+  },
+  {
+   "unit": "loc_log_density_1km",
+   "d_log_loss": 0.00274,
+   "sd": 0.03786,
+   "d_F1": 0.00156
+  },
+  {
+   "unit": "adm_district_LSK",
+   "d_log_loss": 0.00262,
+   "sd": 0.00158,
+   "d_F1": -0.0032
+  },
+  {
+   "unit": "struct_knn8_in_degree",
+   "d_log_loss": 0.00262,
+   "sd": 0.0043,
+   "d_F1": -0.0022
+  },
+  {
+   "unit": "loc_log_dist_town2_km",
+   "d_log_loss": 0.00228,
+   "sd": 0.00496,
+   "d_F1": 0.00185
+  },
+  {
+   "unit": "loc_shape_gap_k8",
+   "d_log_loss": 0.00206,
+   "sd": 0.00661,
+   "d_F1": -0.0011
+  },
+  {
+   "unit": "loc_log_density_500m",
+   "d_log_loss": 0.00187,
+   "sd": 0.04451,
+   "d_F1": -0.00312
+  },
+  {
+   "unit": "neighbour categories",
+   "d_log_loss": 0.00159,
+   "sd": 0.00057,
+   "d_F1": -0.00053
+  },
+  {
+   "unit": "adm_district_LSC",
+   "d_log_loss": 0.00115,
+   "sd": 0.00195,
+   "d_F1": -0.0033
+  },
+  {
+   "unit": "loc_dist_maseru_km",
+   "d_log_loss": 0.00103,
+   "sd": 0.00748,
+   "d_F1": 0.0027
+  },
+  {
+   "unit": "ctx_osm_id_rank_std_k32",
+   "d_log_loss": 0.00062,
+   "sd": 0.00801,
+   "d_F1": 0.00189
+  },
+  {
+   "unit": "adm_district_LSG",
+   "d_log_loss": 0.00052,
+   "sd": 0.00289,
+   "d_F1": 0.00103
+  },
+  {
+   "unit": "loc_shape_linearity_k32",
+   "d_log_loss": 0.00022,
+   "sd": 0.00575,
+   "d_F1": -0.0033
+  },
+  {
+   "unit": "adm_district_LSB",
+   "d_log_loss": 5e-05,
+   "sd": 0.00055,
+   "d_F1": 0.00059
+  },
+  {
+   "unit": "adm_district_LSF",
+   "d_log_loss": -5e-05,
+   "sd": 0.00129,
+   "d_F1": -0.00012
+  },
+  {
+   "unit": "struct_rwse_03",
+   "d_log_loss": -0.0002,
+   "sd": 0.00117,
+   "d_F1": -0.00307
+  },
+  {
+   "unit": "loc_shape_linearity_k8",
+   "d_log_loss": -0.00029,
+   "sd": 0.00559,
+   "d_F1": -0.00372
+  },
+  {
+   "unit": "adm_log_dist_adm2_centre_km",
+   "d_log_loss": -0.00052,
+   "sd": 0.00856,
+   "d_F1": 0.00216
+  },
+  {
+   "unit": "adm_district_LSE",
+   "d_log_loss": -0.00083,
+   "sd": 0.00366,
+   "d_F1": -0.00026
+  },
+  {
+   "unit": "loc_is_urban",
+   "d_log_loss": -0.00088,
+   "sd": 0.00434,
+   "d_F1": -0.00116
+  },
+  {
+   "unit": "adm_district_LSJ",
+   "d_log_loss": -0.00089,
+   "sd": 0.00294,
+   "d_F1": -0.00161
+  },
+  {
+   "unit": "ctx_osm_id_rank_mean_k32",
+   "d_log_loss": -0.00112,
+   "sd": 0.01528,
+   "d_F1": -0.00027
+  },
+  {
+   "unit": "adm_district_LSH",
+   "d_log_loss": -0.00122,
+   "sd": 0.00221,
+   "d_F1": 0.00116
+  },
+  {
+   "unit": "adm_district_LSD",
+   "d_log_loss": -0.00155,
+   "sd": 0.00763,
+   "d_F1": -0.00065
+  },
+  {
+   "unit": "loc_log_town_size",
+   "d_log_loss": -0.00181,
+   "sd": 0.01316,
+   "d_F1": -0.00358
+  },
+  {
+   "unit": "struct_rwse_06",
+   "d_log_loss": -0.00184,
+   "sd": 0.00217,
+   "d_F1": -0.00135
+  },
+  {
+   "unit": "loc_log_dist_town_km",
+   "d_log_loss": -0.00247,
+   "sd": 0.00377,
+   "d_F1": -0.00059
+  },
+  {
+   "unit": "loc_shape_offset_k8",
+   "d_log_loss": -0.00265,
+   "sd": 0.00513,
+   "d_F1": 5e-05
+  },
+  {
+   "unit": "loc_x_km",
+   "d_log_loss": -0.00321,
+   "sd": 0.01313,
+   "d_F1": -0.00143
+  },
+  {
+   "unit": "adm_log_adm1_nodes",
+   "d_log_loss": -0.00326,
+   "sd": 0.01521,
+   "d_F1": 0.00099
+  },
+  {
+   "unit": "struct_rwse_11",
+   "d_log_loss": -0.00491,
+   "sd": 0.00628,
+   "d_F1": -0.00023
+  },
+  {
+   "unit": "ctx_hours_share_k32",
+   "d_log_loss": -0.0054,
+   "sd": 0.01926,
+   "d_F1": 0.00151
+  },
+  {
+   "unit": "adm_density_pct_in_adm2",
+   "d_log_loss": -0.00574,
+   "sd": 0.04179,
+   "d_F1": -0.00243
+  },
+  {
+   "unit": "ctx_point_share_k32",
+   "d_log_loss": -0.00587,
+   "sd": 0.02807,
+   "d_F1": -6e-05
+  },
+  {
+   "unit": "loc_log_town_access_5km",
+   "d_log_loss": -0.00607,
+   "sd": 0.01331,
+   "d_F1": 0.00106
+  },
+  {
+   "unit": "adm_district_LSA",
+   "d_log_loss": -0.00752,
+   "sd": 0.01805,
+   "d_F1": 0.00118
+  },
+  {
+   "unit": "loc_log_density_20km",
+   "d_log_loss": -0.00944,
+   "sd": 0.02115,
+   "d_F1": -0.00112
+  },
+  {
+   "unit": "adm_log_adm2_nodes",
+   "d_log_loss": -0.01058,
+   "sd": 0.03857,
+   "d_F1": 0.00184
+  },
+  {
+   "unit": "loc_log_density_10km",
+   "d_log_loss": -0.01067,
+   "sd": 0.03012,
+   "d_F1": -0.00162
+  },
+  {
+   "unit": "group: adm_",
+   "d_log_loss": -0.01152,
+   "sd": 0.09445,
+   "d_F1": -0.00021
+  },
+  {
+   "unit": "ctx_footprint_share_k32",
+   "d_log_loss": -0.01298,
+   "sd": 0.03373,
+   "d_F1": 0.00085
+  },
+  {
+   "unit": "group: ctx_",
+   "d_log_loss": -0.02735,
+   "sd": 0.15812,
+   "d_F1": -0.00309
+  },
+  {
+   "unit": "ctx_address_share_k32",
+   "d_log_loss": -0.04327,
+   "sd": 0.0952,
+   "d_F1": 0.0064
+  }
+ ],
+ "ro2_neighbour_influence_pp": [
+  {
+   "index": "Infrastructure known",
+   "Infrastructure": 1.444,
+   "Educational": -0.027,
+   "Retail": -0.552,
+   "Other": -0.128,
+   "Food & Beverage": -0.313,
+   "Tourism": -0.198,
+   "Religious": -0.191,
+   "Healthcare": -0.035
+  },
+  {
+   "index": "Educational known",
+   "Infrastructure": -0.099,
+   "Educational": 0.65,
+   "Retail": -0.21,
+   "Other": -0.133,
+   "Food & Beverage": -0.162,
+   "Tourism": -0.394,
+   "Religious": 0.253,
+   "Healthcare": 0.094
+  },
+  {
+   "index": "Retail known",
+   "Infrastructure": -0.67,
+   "Educational": -0.129,
+   "Retail": 0.977,
+   "Other": -0.091,
+   "Food & Beverage": 0.215,
+   "Tourism": -0.254,
+   "Religious": -0.122,
+   "Healthcare": 0.073
+  },
+  {
+   "index": "Other known",
+   "Infrastructure": -0.14,
+   "Educational": -0.044,
+   "Retail": 0.023,
+   "Other": 0.293,
+   "Food & Beverage": -0.028,
+   "Tourism": -0.186,
+   "Religious": -0.072,
+   "Healthcare": 0.154
+  },
+  {
+   "index": "Food & Beverage known",
+   "Infrastructure": -0.156,
+   "Educational": -0.085,
+   "Retail": 0.178,
+   "Other": -0.042,
+   "Food & Beverage": 0.188,
+   "Tourism": 0.132,
+   "Religious": -0.133,
+   "Healthcare": -0.081
+  },
+  {
+   "index": "Tourism known",
+   "Infrastructure": -0.012,
+   "Educational": -0.214,
+   "Retail": -0.102,
+   "Other": -0.119,
+   "Food & Beverage": 0.06,
+   "Tourism": 0.653,
+   "Religious": -0.135,
+   "Healthcare": -0.13
+  },
+  {
+   "index": "Religious known",
+   "Infrastructure": -0.052,
+   "Educational": 0.076,
+   "Retail": -0.062,
+   "Other": -0.021,
+   "Food & Beverage": -0.025,
+   "Tourism": -0.015,
+   "Religious": 0.034,
+   "Healthcare": 0.065
+  },
+  {
+   "index": "Healthcare known",
+   "Infrastructure": 0.017,
+   "Educational": -0.002,
+   "Retail": 0.036,
+   "Other": 0.041,
+   "Food & Beverage": 0.014,
+   "Tourism": -0.011,
+   "Religious": 0.014,
+   "Healthcare": -0.108
+  }
+ ],
+ "ro2_site_f1_deployment": 0.2564,
+ "ro3_prior_factors": {
+  "Infrastructure": 1.0,
+  "Educational": 1.0482,
+  "Retail": 0.6117,
+  "Other": 0.2497,
+  "Food & Beverage": 0.1804,
+  "Tourism": 0.2096,
+  "Religious": 0.2041,
+  "Healthcare": 0.1084
+ },
+ "ro3_flagged": [
+  {
+   "adm2_pcode": "LSA01",
+   "adm1_name": "Maseru",
+   "adm2_name": "Qiloane",
+   "category": "Tourism",
+   "pois": 77,
+   "observed": 8,
+   "expected": 1.14,
+   "gap": -6.86,
+   "z": -6.53,
+   "signal": "cluster",
+   "mapping": "thin"
+  },
+  {
+   "adm2_pcode": "LSH04",
+   "adm1_name": "Qacha's Nek",
+   "adm2_name": "Qacha's Nek",
+   "category": "Infrastructure",
+   "pois": 137,
+   "observed": 59,
+   "expected": 36.71,
+   "gap": -22.29,
+   "z": -4.68,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSC05",
+   "adm1_name": "Leribe",
+   "adm2_name": "Menkhoaneng",
+   "category": "Tourism",
+   "pois": 31,
+   "observed": 10,
+   "expected": 3.11,
+   "gap": -6.89,
+   "z": -4.27,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSD10",
+   "adm1_name": "Berea",
+   "adm2_name": "Tayateyaneng",
+   "category": "Food & Beverage",
+   "pois": 237,
+   "observed": 24,
+   "expected": 10.78,
+   "gap": -13.22,
+   "z": -4.14,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSK03",
+   "adm1_name": "Thaba-Tseka",
+   "adm2_name": "Litsoetse",
+   "category": "Food & Beverage",
+   "pois": 32,
+   "observed": 3,
+   "expected": 0.42,
+   "gap": -2.58,
+   "z": -4.06,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSC03",
+   "adm1_name": "Leribe",
+   "adm2_name": "Ramapepe",
+   "category": "Other",
+   "pois": 20,
+   "observed": 3,
+   "expected": 0.43,
+   "gap": -2.57,
+   "z": -3.97,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSH02",
+   "adm1_name": "Qacha's Nek",
+   "adm2_name": "Ntsupe",
+   "category": "Healthcare",
+   "pois": 51,
+   "observed": 5,
+   "expected": 1.1,
+   "gap": -3.9,
+   "z": -3.79,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSK05",
+   "adm1_name": "Thaba-Tseka",
+   "adm2_name": "Linakeng",
+   "category": "Food & Beverage",
+   "pois": 70,
+   "observed": 5,
+   "expected": 1.11,
+   "gap": -3.89,
+   "z": -3.74,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSE07",
+   "adm1_name": "Mafeteng",
+   "adm2_name": "Qibing",
+   "category": "Food & Beverage",
+   "pois": 40,
+   "observed": 4,
+   "expected": 0.82,
+   "gap": -3.18,
+   "z": -3.59,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSC12",
+   "adm1_name": "Leribe",
+   "adm2_name": "Maputsoe",
+   "category": "Food & Beverage",
+   "pois": 82,
+   "observed": 10,
+   "expected": 3.67,
+   "gap": -6.33,
+   "z": -3.4,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSG06",
+   "adm1_name": "Quthing",
+   "adm2_name": "Quthing",
+   "category": "Healthcare",
+   "pois": 129,
+   "observed": 7,
+   "expected": 2.16,
+   "gap": -4.84,
+   "z": -3.33,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSA04",
+   "adm1_name": "Maseru",
+   "adm2_name": "Manonyane",
+   "category": "Infrastructure",
+   "pois": 120,
+   "observed": 62,
+   "expected": 46.67,
+   "gap": -15.33,
+   "z": -3.09,
+   "signal": "cluster",
+   "mapping": "thin"
+  },
+  {
+   "adm2_pcode": "LSE01",
+   "adm1_name": "Mafeteng",
+   "adm2_name": "Metsi-Maholo",
+   "category": "Other",
+   "pois": 23,
+   "observed": 5,
+   "expected": 1.45,
+   "gap": -3.55,
+   "z": -3.08,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSA02",
+   "adm1_name": "Maseru",
+   "adm2_name": "Ratau",
+   "category": "Infrastructure",
+   "pois": 77,
+   "observed": 43,
+   "expected": 31.92,
+   "gap": -11.08,
+   "z": -3.02,
+   "signal": "cluster",
+   "mapping": "thin"
+  },
+  {
+   "adm2_pcode": "LSB05",
+   "adm1_name": "Butha-Buthe",
+   "adm2_name": "Butha-Buthe (Butha-Buthe District)",
+   "category": "Retail",
+   "pois": 93,
+   "observed": 34,
+   "expected": 22.37,
+   "gap": -11.63,
+   "z": -2.98,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSJ05",
+   "adm1_name": "Mokhotlong",
+   "adm2_name": "Mokhotlong",
+   "category": "Tourism",
+   "pois": 75,
+   "observed": 9,
+   "expected": 3.58,
+   "gap": -5.42,
+   "z": -2.96,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSA12",
+   "adm1_name": "Maseru",
+   "adm2_name": "Maseru (Maseru District)",
+   "category": "Infrastructure",
+   "pois": 1246,
+   "observed": 323,
+   "expected": 284.92,
+   "gap": -38.08,
+   "z": -2.93,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSA12",
+   "adm1_name": "Maseru",
+   "adm2_name": "Maseru (Maseru District)",
+   "category": "Educational",
+   "pois": 1246,
+   "observed": 136,
+   "expected": 108.53,
+   "gap": -27.47,
+   "z": -2.89,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSG06",
+   "adm1_name": "Quthing",
+   "adm2_name": "Quthing",
+   "category": "Tourism",
+   "pois": 129,
+   "observed": 8,
+   "expected": 3.04,
+   "gap": -4.96,
+   "z": -2.88,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSC04",
+   "adm1_name": "Leribe",
+   "adm2_name": "'Maoa-Mafubelu",
+   "category": "Retail",
+   "pois": 141,
+   "observed": 50,
+   "expected": 36.11,
+   "gap": -13.89,
+   "z": -2.81,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSD09",
+   "adm1_name": "Berea",
+   "adm2_name": "Maseru (Berea Distict)",
+   "category": "Retail",
+   "pois": 272,
+   "observed": 90,
+   "expected": 70.83,
+   "gap": -19.17,
+   "z": -2.79,
+   "signal": "cluster",
+   "mapping": "thin"
+  },
+  {
+   "adm2_pcode": "LSB04",
+   "adm1_name": "Butha-Buthe",
+   "adm2_name": "Tsa-le-Moleka",
+   "category": "Food & Beverage",
+   "pois": 25,
+   "observed": 3,
+   "expected": 0.72,
+   "gap": -2.28,
+   "z": -2.75,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSC10",
+   "adm1_name": "Leribe",
+   "adm2_name": "Manka",
+   "category": "Healthcare",
+   "pois": 68,
+   "observed": 4,
+   "expected": 1.13,
+   "gap": -2.87,
+   "z": -2.73,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSD10",
+   "adm1_name": "Berea",
+   "adm2_name": "Tayateyaneng",
+   "category": "Healthcare",
+   "pois": 237,
+   "observed": 10,
+   "expected": 4.5,
+   "gap": -5.5,
+   "z": -2.62,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSG05",
+   "adm1_name": "Quthing",
+   "adm2_name": "Mphaki",
+   "category": "Retail",
+   "pois": 44,
+   "observed": 16,
+   "expected": 10.57,
+   "gap": -5.43,
+   "z": -2.62,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSE05",
+   "adm1_name": "Mafeteng",
+   "adm2_name": "Makoabating",
+   "category": "Infrastructure",
+   "pois": 28,
+   "observed": 17,
+   "expected": 11.52,
+   "gap": -5.48,
+   "z": -2.43,
+   "signal": "cluster",
+   "mapping": "thin"
+  },
+  {
+   "adm2_pcode": "LSK06",
+   "adm1_name": "Thaba-Tseka",
+   "adm2_name": "Thaba-Tseka",
+   "category": "Other",
+   "pois": 85,
+   "observed": 10,
+   "expected": 4.91,
+   "gap": -5.09,
+   "z": -2.41,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSC07",
+   "adm1_name": "Leribe",
+   "adm2_name": "Sephokong",
+   "category": "Healthcare",
+   "pois": 41,
+   "observed": 3,
+   "expected": 0.84,
+   "gap": -2.16,
+   "z": -2.4,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSB02",
+   "adm1_name": "Butha-Buthe",
+   "adm2_name": "Likila",
+   "category": "Food & Beverage",
+   "pois": 36,
+   "observed": 3,
+   "expected": 0.85,
+   "gap": -2.15,
+   "z": -2.36,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSA03",
+   "adm1_name": "Maseru",
+   "adm2_name": "Likolobeng",
+   "category": "Other",
+   "pois": 120,
+   "observed": 11,
+   "expected": 5.62,
+   "gap": -5.38,
+   "z": -2.35,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSA08",
+   "adm1_name": "Maseru",
+   "adm2_name": "Makhoarane",
+   "category": "Tourism",
+   "pois": 58,
+   "observed": 7,
+   "expected": 3.07,
+   "gap": -3.93,
+   "z": -2.33,
+   "signal": "cluster",
+   "mapping": "thin"
+  },
+  {
+   "adm2_pcode": "LSA12",
+   "adm1_name": "Maseru",
+   "adm2_name": "Maseru (Maseru District)",
+   "category": "Other",
+   "pois": 1246,
+   "observed": 85,
+   "expected": 67.14,
+   "gap": -17.86,
+   "z": -2.3,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSJ05",
+   "adm1_name": "Mokhotlong",
+   "adm2_name": "Mokhotlong",
+   "category": "Other",
+   "pois": 75,
+   "observed": 8,
+   "expected": 3.86,
+   "gap": -4.14,
+   "z": -2.2,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSA12",
+   "adm1_name": "Maseru",
+   "adm2_name": "Maseru (Maseru District)",
+   "category": "Religious",
+   "pois": 1246,
+   "observed": 48,
+   "expected": 35.44,
+   "gap": -12.56,
+   "z": -2.17,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSF05",
+   "adm1_name": "Mohale's Hoek",
+   "adm2_name": "Thaba-Mokhele",
+   "category": "Educational",
+   "pois": 30,
+   "observed": 25,
+   "expected": 19.63,
+   "gap": -5.37,
+   "z": -2.15,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSB03",
+   "adm1_name": "Butha-Buthe",
+   "adm2_name": "Nqoe",
+   "category": "Infrastructure",
+   "pois": 112,
+   "observed": 65,
+   "expected": 54.25,
+   "gap": -10.75,
+   "z": -2.11,
+   "signal": "cluster",
+   "mapping": "thin"
+  },
+  {
+   "adm2_pcode": "LSG06",
+   "adm1_name": "Quthing",
+   "adm2_name": "Quthing",
+   "category": "Other",
+   "pois": 129,
+   "observed": 10,
+   "expected": 5.3,
+   "gap": -4.7,
+   "z": -2.11,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSH03",
+   "adm1_name": "Qacha's Nek",
+   "adm2_name": "Tsoelikana",
+   "category": "Educational",
+   "pois": 75,
+   "observed": 48,
+   "expected": 39.79,
+   "gap": -8.21,
+   "z": -2.11,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSG03",
+   "adm1_name": "Quthing",
+   "adm2_name": "Tosing",
+   "category": "Retail",
+   "pois": 41,
+   "observed": 4,
+   "expected": 1.53,
+   "gap": -2.47,
+   "z": -2.07,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSE08",
+   "adm1_name": "Mafeteng",
+   "adm2_name": "Mafeteng",
+   "category": "Other",
+   "pois": 155,
+   "observed": 14,
+   "expected": 8.4,
+   "gap": -5.6,
+   "z": -2.01,
+   "signal": "cluster",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSB03",
+   "adm1_name": "Butha-Buthe",
+   "adm2_name": "Nqoe",
+   "category": "Educational",
+   "pois": 112,
+   "observed": 23,
+   "expected": 31.91,
+   "gap": 8.91,
+   "z": 2.03,
+   "signal": "gap",
+   "mapping": "thin"
+  },
+  {
+   "adm2_pcode": "LSC13",
+   "adm1_name": "Leribe",
+   "adm2_name": "Leribe",
+   "category": "Food & Beverage",
+   "pois": 142,
+   "observed": 6,
+   "expected": 12.96,
+   "gap": 6.96,
+   "z": 2.08,
+   "signal": "gap",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSA08",
+   "adm1_name": "Maseru",
+   "adm2_name": "Makhoarane",
+   "category": "Educational",
+   "pois": 58,
+   "observed": 10,
+   "expected": 16.7,
+   "gap": 6.7,
+   "z": 2.14,
+   "signal": "gap",
+   "mapping": "thin"
+  },
+  {
+   "adm2_pcode": "LSC03",
+   "adm1_name": "Leribe",
+   "adm2_name": "Ramapepe",
+   "category": "Infrastructure",
+   "pois": 20,
+   "observed": 1,
+   "expected": 5.07,
+   "gap": 4.07,
+   "z": 2.17,
+   "signal": "gap",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSC04",
+   "adm1_name": "Leribe",
+   "adm2_name": "'Maoa-Mafubelu",
+   "category": "Other",
+   "pois": 141,
+   "observed": 7,
+   "expected": 14.95,
+   "gap": 7.95,
+   "z": 2.24,
+   "signal": "gap",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSJ05",
+   "adm1_name": "Mokhotlong",
+   "adm2_name": "Mokhotlong",
+   "category": "Educational",
+   "pois": 75,
+   "observed": 11,
+   "expected": 19.1,
+   "gap": 8.1,
+   "z": 2.25,
+   "signal": "gap",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSB02",
+   "adm1_name": "Butha-Buthe",
+   "adm2_name": "Likila",
+   "category": "Infrastructure",
+   "pois": 36,
+   "observed": 6,
+   "expected": 12.71,
+   "gap": 6.71,
+   "z": 2.44,
+   "signal": "gap",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSH03",
+   "adm1_name": "Qacha's Nek",
+   "adm2_name": "Tsoelikana",
+   "category": "Infrastructure",
+   "pois": 75,
+   "observed": 9,
+   "expected": 18.56,
+   "gap": 9.56,
+   "z": 2.64,
+   "signal": "gap",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSB01",
+   "adm1_name": "Butha-Buthe",
+   "adm2_name": "Ngoajane",
+   "category": "Tourism",
+   "pois": 54,
+   "observed": 0,
+   "expected": 5.11,
+   "gap": 5.11,
+   "z": 2.67,
+   "signal": "gap",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSD08",
+   "adm1_name": "Berea",
+   "adm2_name": "Kanana",
+   "category": "Educational",
+   "pois": 37,
+   "observed": 6,
+   "expected": 13.92,
+   "gap": 7.92,
+   "z": 2.77,
+   "signal": "gap",
+   "mapping": "thin"
+  },
+  {
+   "adm2_pcode": "LSA02",
+   "adm1_name": "Maseru",
+   "adm2_name": "Ratau",
+   "category": "Educational",
+   "pois": 77,
+   "observed": 18,
+   "expected": 28.71,
+   "gap": 10.71,
+   "z": 2.89,
+   "signal": "gap",
+   "mapping": "thin"
+  },
+  {
+   "adm2_pcode": "LSA12",
+   "adm1_name": "Maseru",
+   "adm2_name": "Maseru (Maseru District)",
+   "category": "Retail",
+   "pois": 1246,
+   "observed": 433,
+   "expected": 479.22,
+   "gap": 46.22,
+   "z": 2.9,
+   "signal": "gap",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSG06",
+   "adm1_name": "Quthing",
+   "adm2_name": "Quthing",
+   "category": "Retail",
+   "pois": 129,
+   "observed": 33,
+   "expected": 48.38,
+   "gap": 15.38,
+   "z": 3.17,
+   "signal": "gap",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSA01",
+   "adm1_name": "Maseru",
+   "adm2_name": "Qiloane",
+   "category": "Retail",
+   "pois": 77,
+   "observed": 0,
+   "expected": 8.36,
+   "gap": 8.36,
+   "z": 3.38,
+   "signal": "gap",
+   "mapping": "thin"
+  },
+  {
+   "adm2_pcode": "LSA12",
+   "adm1_name": "Maseru",
+   "adm2_name": "Maseru (Maseru District)",
+   "category": "Healthcare",
+   "pois": 1246,
+   "observed": 70,
+   "expected": 107.39,
+   "gap": 37.39,
+   "z": 4.01,
+   "signal": "gap",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSH04",
+   "adm1_name": "Qacha's Nek",
+   "adm2_name": "Qacha's Nek",
+   "category": "Other",
+   "pois": 137,
+   "observed": 9,
+   "expected": 27.73,
+   "gap": 18.73,
+   "z": 4.33,
+   "signal": "gap",
+   "mapping": ""
+  },
+  {
+   "adm2_pcode": "LSD10",
+   "adm1_name": "Berea",
+   "adm2_name": "Tayateyaneng",
+   "category": "Infrastructure",
+   "pois": 237,
+   "observed": 35,
+   "expected": 63.77,
+   "gap": 28.77,
+   "z": 4.55,
+   "signal": "gap",
+   "mapping": ""
+  }
+ ]
+}

@@ -1,0 +1,625 @@
+adm1_name,adm2_name,adm2_pcode,category,pois,observed,expected,gap,z,signal,mapping
+Maseru,Qiloane,LSA01,Infrastructure,77,42,41.6,-0.4,-0.11,,thin
+Maseru,Qiloane,LSA01,Educational,77,17,16.38,-0.62,-0.22,,thin
+Maseru,Qiloane,LSA01,Retail,77,0,8.36,8.36,3.38,gap,thin
+Maseru,Qiloane,LSA01,Other,77,5,4.07,-0.93,-0.49,,thin
+Maseru,Qiloane,LSA01,Food & Beverage,77,2,1.3,-0.7,-0.62,,thin
+Maseru,Qiloane,LSA01,Tourism,77,8,1.14,-6.86,-6.53,cluster,thin
+Maseru,Qiloane,LSA01,Religious,77,2,3.29,1.29,0.73,,thin
+Maseru,Qiloane,LSA01,Healthcare,77,1,0.88,-0.12,-0.13,,thin
+Maseru,Ratau,LSA02,Infrastructure,77,43,31.92,-11.08,-3.02,cluster,thin
+Maseru,Ratau,LSA02,Educational,77,18,28.71,10.71,2.89,gap,thin
+Maseru,Ratau,LSA02,Retail,77,4,3.53,-0.47,-0.26,,thin
+Maseru,Ratau,LSA02,Other,77,2,2.89,0.89,0.54,,thin
+Maseru,Ratau,LSA02,Food & Beverage,77,2,1.77,-0.23,-0.18,,thin
+Maseru,Ratau,LSA02,Tourism,77,4,2.86,-1.14,-0.69,,thin
+Maseru,Ratau,LSA02,Religious,77,4,4.22,0.22,0.11,,thin
+Maseru,Ratau,LSA02,Healthcare,77,0,1.1,1.1,1.06,,thin
+Maseru,Likolobeng,LSA03,Infrastructure,120,40,42.93,2.93,0.58,,
+Maseru,Likolobeng,LSA03,Educational,120,40,37.44,-2.56,-0.56,,
+Maseru,Likolobeng,LSA03,Retail,120,8,7.88,-0.12,-0.05,,
+Maseru,Likolobeng,LSA03,Other,120,11,5.62,-5.38,-2.35,cluster,
+Maseru,Likolobeng,LSA03,Food & Beverage,120,4,3.27,-0.73,-0.41,,
+Maseru,Likolobeng,LSA03,Tourism,120,10,15.39,5.39,1.6,,
+Maseru,Likolobeng,LSA03,Religious,120,5,5.04,0.04,0.02,,
+Maseru,Likolobeng,LSA03,Healthcare,120,2,2.43,0.43,0.28,,
+Maseru,Manonyane,LSA04,Infrastructure,120,62,46.67,-15.33,-3.09,cluster,thin
+Maseru,Manonyane,LSA04,Educational,120,23,24.5,1.5,0.36,,thin
+Maseru,Manonyane,LSA04,Retail,120,12,18.44,6.44,1.74,,thin
+Maseru,Manonyane,LSA04,Other,120,5,10.45,5.45,1.82,,thin
+Maseru,Manonyane,LSA04,Food & Beverage,120,6,4.37,-1.63,-0.8,,thin
+Maseru,Manonyane,LSA04,Tourism,120,3,5.82,2.82,1.2,,thin
+Maseru,Manonyane,LSA04,Religious,120,6,7.82,1.82,0.68,,thin
+Maseru,Manonyane,LSA04,Healthcare,120,3,1.94,-1.06,-0.77,,thin
+Maseru,Mohlakeng,LSA05,Infrastructure,124,61,62.75,1.75,0.34,,thin
+Maseru,Mohlakeng,LSA05,Educational,124,19,25.39,6.39,1.51,,thin
+Maseru,Mohlakeng,LSA05,Retail,124,18,12.43,-5.57,-1.72,,thin
+Maseru,Mohlakeng,LSA05,Other,124,10,7.86,-2.14,-0.81,,thin
+Maseru,Mohlakeng,LSA05,Food & Beverage,124,3,3.13,0.13,0.07,,thin
+Maseru,Mohlakeng,LSA05,Tourism,124,4,4.08,0.08,0.04,,thin
+Maseru,Mohlakeng,LSA05,Religious,124,8,6.29,-1.71,-0.71,,thin
+Maseru,Mohlakeng,LSA05,Healthcare,124,1,2.08,1.08,0.76,,thin
+Maseru,Thota-ea-Moli,LSA06,Infrastructure,28,14,12.51,-1.49,-0.59,,thin
+Maseru,Thota-ea-Moli,LSA06,Educational,28,8,9.52,1.52,0.66,,thin
+Maseru,Thota-ea-Moli,LSA06,Retail,28,3,1.57,-1.43,-1.18,,thin
+Maseru,Thota-ea-Moli,LSA06,Other,28,0,1.35,1.35,1.2,,thin
+Maseru,Thota-ea-Moli,LSA06,Food & Beverage,28,0,0.38,0.38,0.62,,thin
+Maseru,Thota-ea-Moli,LSA06,Tourism,28,1,0.98,-0.02,-0.02,,thin
+Maseru,Thota-ea-Moli,LSA06,Religious,28,1,1.22,0.22,0.21,,thin
+Maseru,Thota-ea-Moli,LSA06,Healthcare,28,1,0.46,-0.54,-0.79,,thin
+Maseru,Lilala,LSA07,Infrastructure,58,16,14.99,-1.01,-0.32,,
+Maseru,Lilala,LSA07,Educational,58,26,25.41,-0.59,-0.16,,
+Maseru,Lilala,LSA07,Retail,58,5,4.7,-0.3,-0.15,,
+Maseru,Lilala,LSA07,Other,58,2,3.87,1.87,0.99,,
+Maseru,Lilala,LSA07,Food & Beverage,58,2,1.52,-0.48,-0.39,,
+Maseru,Lilala,LSA07,Tourism,58,1,1.68,0.68,0.53,,
+Maseru,Lilala,LSA07,Religious,58,4,4.28,0.28,0.14,,
+Maseru,Lilala,LSA07,Healthcare,58,2,1.55,-0.45,-0.37,,
+Maseru,Makhoarane,LSA08,Infrastructure,58,20,17.0,-3.0,-0.94,,thin
+Maseru,Makhoarane,LSA08,Educational,58,10,16.7,6.7,2.14,gap,thin
+Maseru,Makhoarane,LSA08,Retail,58,6,9.05,3.05,1.22,,thin
+Maseru,Makhoarane,LSA08,Other,58,5,6.25,1.25,0.55,,thin
+Maseru,Makhoarane,LSA08,Food & Beverage,58,4,1.87,-2.13,-1.6,,thin
+Maseru,Makhoarane,LSA08,Tourism,58,7,3.07,-3.93,-2.33,cluster,thin
+Maseru,Makhoarane,LSA08,Religious,58,5,2.75,-2.25,-1.4,,thin
+Maseru,Makhoarane,LSA08,Healthcare,58,1,1.32,0.32,0.28,,thin
+Maseru,Kubake,LSA09,Infrastructure,51,10,14.15,4.15,1.32,,
+Maseru,Kubake,LSA09,Educational,51,20,22.66,2.66,0.8,,
+Maseru,Kubake,LSA09,Retail,51,4,3.0,-1.0,-0.6,,
+Maseru,Kubake,LSA09,Other,51,4,3.51,-0.49,-0.27,,
+Maseru,Kubake,LSA09,Food & Beverage,51,2,1.12,-0.88,-0.84,,
+Maseru,Kubake,LSA09,Tourism,51,5,3.08,-1.92,-1.15,,
+Maseru,Kubake,LSA09,Religious,51,3,2.31,-0.69,-0.47,,
+Maseru,Kubake,LSA09,Healthcare,51,3,1.16,-1.84,-1.73,,
+Maseru,Makhoalipana,LSA10,Infrastructure,37,13,9.71,-3.29,-1.25,,
+Maseru,Makhoalipana,LSA10,Educational,37,23,19.95,-3.05,-1.07,,
+Maseru,Makhoalipana,LSA10,Retail,37,0,1.23,1.23,1.15,,
+Maseru,Makhoalipana,LSA10,Other,37,0,1.63,1.63,1.32,,
+Maseru,Makhoalipana,LSA10,Food & Beverage,37,0,0.62,0.62,0.8,,
+Maseru,Makhoalipana,LSA10,Tourism,37,0,2.1,2.1,1.53,,
+Maseru,Makhoalipana,LSA10,Religious,37,0,1.07,1.07,1.06,,
+Maseru,Makhoalipana,LSA10,Healthcare,37,1,0.68,-0.32,-0.39,,
+Maseru,Semonkong,LSA11,Infrastructure,47,13,15.01,2.01,0.64,,thin
+Maseru,Semonkong,LSA11,Educational,47,8,8.31,0.31,0.13,,thin
+Maseru,Semonkong,LSA11,Retail,47,10,7.3,-2.7,-1.14,,thin
+Maseru,Semonkong,LSA11,Other,47,5,5.74,0.74,0.34,,thin
+Maseru,Semonkong,LSA11,Food & Beverage,47,0,2.0,2.0,1.46,,thin
+Maseru,Semonkong,LSA11,Tourism,47,9,6.03,-2.97,-1.36,,thin
+Maseru,Semonkong,LSA11,Religious,47,0,1.6,1.6,1.29,,thin
+Maseru,Semonkong,LSA11,Healthcare,47,2,1.01,-0.99,-1.0,,thin
+Maseru,Maseru (Maseru District),LSA12,Infrastructure,1246,323,284.92,-38.08,-2.93,cluster,
+Maseru,Maseru (Maseru District),LSA12,Educational,1246,136,108.53,-27.47,-2.89,cluster,
+Maseru,Maseru (Maseru District),LSA12,Retail,1246,433,479.22,46.22,2.9,gap,
+Maseru,Maseru (Maseru District),LSA12,Other,1246,85,67.14,-17.86,-2.3,cluster,
+Maseru,Maseru (Maseru District),LSA12,Food & Beverage,1246,117,134.36,17.36,1.63,,
+Maseru,Maseru (Maseru District),LSA12,Tourism,1246,34,29.0,-5.0,-0.95,,
+Maseru,Maseru (Maseru District),LSA12,Religious,1246,48,35.44,-12.56,-2.17,cluster,
+Maseru,Maseru (Maseru District),LSA12,Healthcare,1246,70,107.39,37.39,4.01,gap,
+Butha-Buthe,Ngoajane,LSB01,Infrastructure,54,20,18.87,-1.13,-0.33,,
+Butha-Buthe,Ngoajane,LSB01,Educational,54,24,21.92,-2.08,-0.6,,
+Butha-Buthe,Ngoajane,LSB01,Retail,54,2,2.58,0.58,0.37,,
+Butha-Buthe,Ngoajane,LSB01,Other,54,3,1.79,-1.21,-0.92,,
+Butha-Buthe,Ngoajane,LSB01,Food & Beverage,54,2,1.25,-0.75,-0.68,,
+Butha-Buthe,Ngoajane,LSB01,Tourism,54,0,5.11,5.11,2.67,gap,
+Butha-Buthe,Ngoajane,LSB01,Religious,54,1,1.56,0.56,0.46,,
+Butha-Buthe,Ngoajane,LSB01,Healthcare,54,2,0.92,-1.08,-1.14,,
+Butha-Buthe,Likila,LSB02,Infrastructure,36,6,12.71,6.71,2.44,gap,
+Butha-Buthe,Likila,LSB02,Educational,36,20,16.32,-3.68,-1.31,,
+Butha-Buthe,Likila,LSB02,Retail,36,1,1.83,0.83,0.63,,
+Butha-Buthe,Likila,LSB02,Other,36,2,1.07,-0.93,-0.91,,
+Butha-Buthe,Likila,LSB02,Food & Beverage,36,3,0.85,-2.15,-2.36,cluster,
+Butha-Buthe,Likila,LSB02,Tourism,36,0,1.26,1.26,1.15,,
+Butha-Buthe,Likila,LSB02,Religious,36,2,1.17,-0.83,-0.79,,
+Butha-Buthe,Likila,LSB02,Healthcare,36,2,0.78,-1.22,-1.4,,
+Butha-Buthe,Nqoe,LSB03,Infrastructure,112,65,54.25,-10.75,-2.11,cluster,thin
+Butha-Buthe,Nqoe,LSB03,Educational,112,23,31.91,8.91,2.03,gap,thin
+Butha-Buthe,Nqoe,LSB03,Retail,112,4,5.19,1.19,0.54,,thin
+Butha-Buthe,Nqoe,LSB03,Other,112,1,3.49,2.49,1.37,,thin
+Butha-Buthe,Nqoe,LSB03,Food & Beverage,112,2,2.62,0.62,0.39,,thin
+Butha-Buthe,Nqoe,LSB03,Tourism,112,14,11.13,-2.87,-0.94,,thin
+Butha-Buthe,Nqoe,LSB03,Religious,112,1,2.07,1.07,0.75,,thin
+Butha-Buthe,Nqoe,LSB03,Healthcare,112,2,1.35,-0.65,-0.57,,thin
+Butha-Buthe,Tsa-le-Moleka,LSB04,Infrastructure,25,6,7.29,1.29,0.59,,
+Butha-Buthe,Tsa-le-Moleka,LSB04,Educational,25,12,13.28,1.28,0.54,,
+Butha-Buthe,Tsa-le-Moleka,LSB04,Retail,25,2,1.05,-0.95,-0.95,,
+Butha-Buthe,Tsa-le-Moleka,LSB04,Other,25,0,0.72,0.72,0.87,,
+Butha-Buthe,Tsa-le-Moleka,LSB04,Food & Beverage,25,3,0.72,-2.28,-2.75,cluster,
+Butha-Buthe,Tsa-le-Moleka,LSB04,Tourism,25,0,0.47,0.47,0.7,,
+Butha-Buthe,Tsa-le-Moleka,LSB04,Religious,25,2,1.03,-0.97,-0.99,,
+Butha-Buthe,Tsa-le-Moleka,LSB04,Healthcare,25,0,0.43,0.43,0.66,,
+Butha-Buthe,Butha-Buthe (Butha-Buthe District),LSB05,Infrastructure,93,23,28.37,5.37,1.24,,
+Butha-Buthe,Butha-Buthe (Butha-Buthe District),LSB05,Educational,93,16,18.7,2.7,0.75,,
+Butha-Buthe,Butha-Buthe (Butha-Buthe District),LSB05,Retail,93,34,22.37,-11.63,-2.98,cluster,
+Butha-Buthe,Butha-Buthe (Butha-Buthe District),LSB05,Other,93,3,5.78,2.78,1.21,,
+Butha-Buthe,Butha-Buthe (Butha-Buthe District),LSB05,Food & Beverage,93,5,6.31,1.31,0.55,,
+Butha-Buthe,Butha-Buthe (Butha-Buthe District),LSB05,Tourism,93,5,3.86,-1.14,-0.6,,
+Butha-Buthe,Butha-Buthe (Butha-Buthe District),LSB05,Religious,93,4,5.35,1.35,0.61,,
+Butha-Buthe,Butha-Buthe (Butha-Buthe District),LSB05,Healthcare,93,3,2.25,-0.75,-0.51,,
+Leribe,Matsoku,LSC01,Infrastructure,86,31,30.02,-0.98,-0.23,,thin
+Leribe,Matsoku,LSC01,Educational,86,32,32.16,0.16,0.04,,thin
+Leribe,Matsoku,LSC01,Retail,86,7,5.49,-1.51,-0.69,,thin
+Leribe,Matsoku,LSC01,Other,86,3,3.63,0.63,0.34,,thin
+Leribe,Matsoku,LSC01,Food & Beverage,86,4,2.72,-1.28,-0.8,,thin
+Leribe,Matsoku,LSC01,Tourism,86,7,8.98,1.98,0.72,,thin
+Leribe,Matsoku,LSC01,Religious,86,0,1.64,1.64,1.29,,thin
+Leribe,Matsoku,LSC01,Healthcare,86,2,1.37,-0.63,-0.54,,thin
+Leribe,Bolahla,LSC02,Infrastructure,23,4,5.16,1.16,0.59,,
+Leribe,Bolahla,LSC02,Educational,23,16,13.45,-2.55,-1.12,,
+Leribe,Bolahla,LSC02,Retail,23,0,0.82,0.82,0.94,,
+Leribe,Bolahla,LSC02,Other,23,1,1.21,0.21,0.2,,
+Leribe,Bolahla,LSC02,Food & Beverage,23,2,0.46,-1.54,-2.3,,
+Leribe,Bolahla,LSC02,Tourism,23,0,0.41,0.41,0.65,,
+Leribe,Bolahla,LSC02,Religious,23,0,0.98,0.98,1.02,,
+Leribe,Bolahla,LSC02,Healthcare,23,0,0.5,0.5,0.72,,
+Leribe,Ramapepe,LSC03,Infrastructure,20,1,5.07,4.07,2.17,gap,
+Leribe,Ramapepe,LSC03,Educational,20,13,11.79,-1.21,-0.58,,
+Leribe,Ramapepe,LSC03,Retail,20,0,0.54,0.54,0.75,,
+Leribe,Ramapepe,LSC03,Other,20,3,0.43,-2.57,-3.97,cluster,
+Leribe,Ramapepe,LSC03,Food & Beverage,20,1,0.65,-0.35,-0.44,,
+Leribe,Ramapepe,LSC03,Tourism,20,1,0.34,-0.66,-1.14,,
+Leribe,Ramapepe,LSC03,Religious,20,0,0.9,0.9,0.98,,
+Leribe,Ramapepe,LSC03,Healthcare,20,1,0.27,-0.73,-1.4,,
+Leribe,'Maoa-Mafubelu,LSC04,Infrastructure,141,37,36.06,-0.94,-0.19,,
+Leribe,'Maoa-Mafubelu,LSC04,Educational,141,21,25.9,4.9,1.16,,
+Leribe,'Maoa-Mafubelu,LSC04,Retail,141,50,36.11,-13.89,-2.81,cluster,
+Leribe,'Maoa-Mafubelu,LSC04,Other,141,7,14.95,7.95,2.24,gap,
+Leribe,'Maoa-Mafubelu,LSC04,Food & Beverage,141,10,14.26,4.26,1.22,,
+Leribe,'Maoa-Mafubelu,LSC04,Tourism,141,2,4.97,2.97,1.36,,
+Leribe,'Maoa-Mafubelu,LSC04,Religious,141,9,5.42,-3.58,-1.58,,
+Leribe,'Maoa-Mafubelu,LSC04,Healthcare,141,5,3.33,-1.67,-0.93,,
+Leribe,Menkhoaneng,LSC05,Infrastructure,31,5,8.66,3.66,1.52,,
+Leribe,Menkhoaneng,LSC05,Educational,31,12,12.87,0.87,0.36,,
+Leribe,Menkhoaneng,LSC05,Retail,31,1,1.72,0.72,0.58,,
+Leribe,Menkhoaneng,LSC05,Other,31,1,1.79,0.79,0.62,,
+Leribe,Menkhoaneng,LSC05,Food & Beverage,31,2,1.45,-0.55,-0.48,,
+Leribe,Menkhoaneng,LSC05,Tourism,31,10,3.11,-6.89,-4.27,cluster,
+Leribe,Menkhoaneng,LSC05,Religious,31,0,0.92,0.92,0.97,,
+Leribe,Menkhoaneng,LSC05,Healthcare,31,0,0.48,0.48,0.7,,
+Leribe,Maisa-Phoka,LSC06,Infrastructure,10,2,2.28,0.28,0.22,,
+Leribe,Maisa-Phoka,LSC06,Educational,10,6,6.06,0.06,0.04,,
+Leribe,Maisa-Phoka,LSC06,Retail,10,1,0.4,-0.6,-0.97,,
+Leribe,Maisa-Phoka,LSC06,Other,10,0,0.27,0.27,0.52,,
+Leribe,Maisa-Phoka,LSC06,Food & Beverage,10,1,0.22,-0.78,-1.7,,
+Leribe,Maisa-Phoka,LSC06,Tourism,10,0,0.27,0.27,0.53,,
+Leribe,Maisa-Phoka,LSC06,Religious,10,0,0.38,0.38,0.63,,
+Leribe,Maisa-Phoka,LSC06,Healthcare,10,0,0.12,0.12,0.35,,
+Leribe,Sephokong,LSC07,Infrastructure,41,8,8.18,0.18,0.07,,
+Leribe,Sephokong,LSC07,Educational,41,23,21.58,-1.42,-0.46,,
+Leribe,Sephokong,LSC07,Retail,41,3,3.18,0.18,0.11,,
+Leribe,Sephokong,LSC07,Other,41,0,1.75,1.75,1.36,,
+Leribe,Sephokong,LSC07,Food & Beverage,41,0,1.61,1.61,1.3,,
+Leribe,Sephokong,LSC07,Tourism,41,0,1.46,1.46,1.24,,
+Leribe,Sephokong,LSC07,Religious,41,4,2.38,-1.62,-1.09,,
+Leribe,Sephokong,LSC07,Healthcare,41,3,0.84,-2.16,-2.4,cluster,
+Leribe,Litjotjela,LSC08,Infrastructure,14,2,2.32,0.32,0.24,,
+Leribe,Litjotjela,LSC08,Educational,14,10,9.64,-0.36,-0.22,,
+Leribe,Litjotjela,LSC08,Retail,14,0,0.33,0.33,0.59,,
+Leribe,Litjotjela,LSC08,Other,14,0,0.16,0.16,0.4,,
+Leribe,Litjotjela,LSC08,Food & Beverage,14,1,0.48,-0.52,-0.77,,
+Leribe,Litjotjela,LSC08,Tourism,14,0,0.23,0.23,0.49,,
+Leribe,Litjotjela,LSC08,Religious,14,1,0.66,-0.34,-0.43,,
+Leribe,Litjotjela,LSC08,Healthcare,14,0,0.17,0.17,0.42,,
+Leribe,Hleoheng,LSC09,Infrastructure,13,3,3.87,0.87,0.56,,
+Leribe,Hleoheng,LSC09,Educational,13,7,4.85,-2.15,-1.28,,
+Leribe,Hleoheng,LSC09,Retail,13,1,1.67,0.67,0.58,,
+Leribe,Hleoheng,LSC09,Other,13,0,0.39,0.39,0.64,,
+Leribe,Hleoheng,LSC09,Food & Beverage,13,1,0.68,-0.32,-0.41,,
+Leribe,Hleoheng,LSC09,Tourism,13,0,0.26,0.26,0.52,,
+Leribe,Hleoheng,LSC09,Religious,13,1,1.01,0.01,0.02,,
+Leribe,Hleoheng,LSC09,Healthcare,13,0,0.26,0.26,0.52,,
+Leribe,Manka,LSC10,Infrastructure,68,17,16.47,-0.53,-0.16,,
+Leribe,Manka,LSC10,Educational,68,20,20.52,0.52,0.16,,
+Leribe,Manka,LSC10,Retail,68,16,11.3,-4.7,-1.7,,
+Leribe,Manka,LSC10,Other,68,4,6.46,2.46,1.09,,
+Leribe,Manka,LSC10,Food & Beverage,68,4,5.12,1.12,0.53,,
+Leribe,Manka,LSC10,Tourism,68,1,2.07,1.07,0.76,,
+Leribe,Manka,LSC10,Religious,68,2,4.93,2.93,1.42,,
+Leribe,Manka,LSC10,Healthcare,68,4,1.13,-2.87,-2.73,cluster,
+Leribe,Tsuili-Tsuili,LSC11,Infrastructure,30,3,6.48,3.48,1.56,,
+Leribe,Tsuili-Tsuili,LSC11,Educational,30,18,14.59,-3.41,-1.32,,
+Leribe,Tsuili-Tsuili,LSC11,Retail,30,4,2.41,-1.59,-1.09,,
+Leribe,Tsuili-Tsuili,LSC11,Other,30,3,1.83,-1.17,-0.91,,
+Leribe,Tsuili-Tsuili,LSC11,Food & Beverage,30,0,1.34,1.34,1.21,,
+Leribe,Tsuili-Tsuili,LSC11,Tourism,30,0,0.89,0.89,0.96,,
+Leribe,Tsuili-Tsuili,LSC11,Religious,30,2,1.76,-0.24,-0.18,,
+Leribe,Tsuili-Tsuili,LSC11,Healthcare,30,0,0.69,0.69,0.84,,
+Leribe,Maputsoe,LSC12,Infrastructure,82,24,23.97,-0.03,-0.01,,
+Leribe,Maputsoe,LSC12,Educational,82,17,18.51,1.51,0.42,,
+Leribe,Maputsoe,LSC12,Retail,82,19,18.91,-0.09,-0.03,,
+Leribe,Maputsoe,LSC12,Other,82,6,5.79,-0.21,-0.09,,
+Leribe,Maputsoe,LSC12,Food & Beverage,82,10,3.67,-6.33,-3.4,cluster,
+Leribe,Maputsoe,LSC12,Tourism,82,4,3.6,-0.4,-0.21,,
+Leribe,Maputsoe,LSC12,Religious,82,2,5.85,3.85,1.67,,
+Leribe,Maputsoe,LSC12,Healthcare,82,0,1.69,1.69,1.32,,
+Leribe,Leribe,LSC13,Infrastructure,142,41,47.87,6.87,1.29,,
+Leribe,Leribe,LSC13,Educational,142,22,22.49,0.49,0.12,,
+Leribe,Leribe,LSC13,Retail,142,41,36.93,-4.07,-0.84,,
+Leribe,Leribe,LSC13,Other,142,10,6.16,-3.84,-1.59,,
+Leribe,Leribe,LSC13,Food & Beverage,142,6,12.96,6.96,2.08,gap,
+Leribe,Leribe,LSC13,Tourism,142,8,6.67,-1.33,-0.53,,
+Leribe,Leribe,LSC13,Religious,142,12,7.14,-4.86,-1.9,,
+Leribe,Leribe,LSC13,Healthcare,142,2,1.79,-0.21,-0.16,,
+Leribe,Butha-Buthe (Leribe District),LSC14,Infrastructure,13,7,5.13,-1.87,-1.12,,
+Leribe,Butha-Buthe (Leribe District),LSC14,Educational,13,2,3.68,1.68,1.07,,
+Leribe,Butha-Buthe (Leribe District),LSC14,Retail,13,2,1.44,-0.56,-0.51,,
+Leribe,Butha-Buthe (Leribe District),LSC14,Other,13,1,0.63,-0.37,-0.48,,
+Leribe,Butha-Buthe (Leribe District),LSC14,Food & Beverage,13,1,0.66,-0.34,-0.43,,
+Leribe,Butha-Buthe (Leribe District),LSC14,Tourism,13,0,0.59,0.59,0.79,,
+Leribe,Butha-Buthe (Leribe District),LSC14,Religious,13,0,0.69,0.69,0.86,,
+Leribe,Butha-Buthe (Leribe District),LSC14,Healthcare,13,0,0.18,0.18,0.42,,
+Berea,Makeoana,LSD01,Infrastructure,14,2,3.66,1.66,1.02,,
+Berea,Makeoana,LSD01,Educational,14,10,7.74,-2.26,-1.23,,
+Berea,Makeoana,LSD01,Retail,14,0,0.36,0.36,0.61,,
+Berea,Makeoana,LSD01,Other,14,0,0.67,0.67,0.84,,
+Berea,Makeoana,LSD01,Food & Beverage,14,0,0.27,0.27,0.52,,
+Berea,Makeoana,LSD01,Tourism,14,1,0.63,-0.37,-0.48,,
+Berea,Makeoana,LSD01,Religious,14,0,0.44,0.44,0.68,,
+Berea,Makeoana,LSD01,Healthcare,14,1,0.23,-0.77,-1.64,,
+Berea,Mapoteng,LSD02,Infrastructure,15,5,3.1,-1.9,-1.24,,thin
+Berea,Mapoteng,LSD02,Educational,15,8,9.36,1.36,0.75,,thin
+Berea,Mapoteng,LSD02,Retail,15,0,0.42,0.42,0.66,,thin
+Berea,Mapoteng,LSD02,Other,15,1,0.62,-0.38,-0.5,,thin
+Berea,Mapoteng,LSD02,Food & Beverage,15,0,0.31,0.31,0.56,,thin
+Berea,Mapoteng,LSD02,Tourism,15,0,0.47,0.47,0.7,,thin
+Berea,Mapoteng,LSD02,Religious,15,1,0.48,-0.52,-0.76,,thin
+Berea,Mapoteng,LSD02,Healthcare,15,0,0.25,0.25,0.5,,thin
+Berea,Kueneng,LSD03,Infrastructure,10,3,2.77,-0.23,-0.19,,
+Berea,Kueneng,LSD03,Educational,10,5,5.12,0.12,0.08,,
+Berea,Kueneng,LSD03,Retail,10,0,0.38,0.38,0.63,,
+Berea,Kueneng,LSD03,Other,10,0,0.21,0.21,0.47,,
+Berea,Kueneng,LSD03,Food & Beverage,10,0,0.27,0.27,0.53,,
+Berea,Kueneng,LSD03,Tourism,10,0,0.3,0.3,0.56,,
+Berea,Kueneng,LSD03,Religious,10,1,0.8,-0.2,-0.24,,
+Berea,Kueneng,LSD03,Healthcare,10,1,0.15,-0.85,-2.23,,
+Berea,Tebe-Tebe,LSD04,Infrastructure,44,11,11.87,0.87,0.3,,
+Berea,Tebe-Tebe,LSD04,Educational,44,13,14.12,1.12,0.4,,
+Berea,Tebe-Tebe,LSD04,Retail,44,4,5.64,1.64,0.77,,
+Berea,Tebe-Tebe,LSD04,Other,44,4,4.59,0.59,0.31,,
+Berea,Tebe-Tebe,LSD04,Food & Beverage,44,2,1.7,-0.3,-0.24,,
+Berea,Tebe-Tebe,LSD04,Tourism,44,5,2.45,-2.55,-1.68,,
+Berea,Tebe-Tebe,LSD04,Religious,44,2,2.56,0.56,0.36,,
+Berea,Tebe-Tebe,LSD04,Healthcare,44,3,1.07,-1.93,-1.9,,
+Berea,Phuthiatsana,LSD05,Infrastructure,16,1,3.2,2.2,1.4,,
+Berea,Phuthiatsana,LSD05,Educational,16,10,9.67,-0.33,-0.18,,
+Berea,Phuthiatsana,LSD05,Retail,16,0,0.76,0.76,0.91,,
+Berea,Phuthiatsana,LSD05,Other,16,2,0.61,-1.39,-1.81,,
+Berea,Phuthiatsana,LSD05,Food & Beverage,16,0,0.36,0.36,0.61,,
+Berea,Phuthiatsana,LSD05,Tourism,16,0,0.42,0.42,0.66,,
+Berea,Phuthiatsana,LSD05,Religious,16,2,0.68,-1.32,-1.65,,
+Berea,Phuthiatsana,LSD05,Healthcare,16,1,0.29,-0.71,-1.31,,
+Berea,Motanasela,LSD06,Infrastructure,47,11,11.97,0.97,0.34,,
+Berea,Motanasela,LSD06,Educational,47,23,18.21,-4.79,-1.56,,
+Berea,Motanasela,LSD06,Retail,47,3,4.87,1.87,0.93,,
+Berea,Motanasela,LSD06,Other,47,5,4.23,-0.77,-0.41,,
+Berea,Motanasela,LSD06,Food & Beverage,47,1,1.25,0.25,0.23,,
+Berea,Motanasela,LSD06,Tourism,47,0,2.19,2.19,1.52,,
+Berea,Motanasela,LSD06,Religious,47,2,2.73,0.73,0.46,,
+Berea,Motanasela,LSD06,Healthcare,47,2,1.55,-0.45,-0.37,,
+Berea,Senekane,LSD07,Infrastructure,50,24,22.89,-1.11,-0.41,,thin
+Berea,Senekane,LSD07,Educational,50,19,18.83,-0.17,-0.06,,thin
+Berea,Senekane,LSD07,Retail,50,1,1.72,0.72,0.57,,thin
+Berea,Senekane,LSD07,Other,50,1,1.32,0.32,0.28,,thin
+Berea,Senekane,LSD07,Food & Beverage,50,2,0.84,-1.16,-1.29,,thin
+Berea,Senekane,LSD07,Tourism,50,1,1.33,0.33,0.3,,thin
+Berea,Senekane,LSD07,Religious,50,2,2.1,0.1,0.07,,thin
+Berea,Senekane,LSD07,Healthcare,50,0,0.97,0.97,1.01,,thin
+Berea,Kanana,LSD08,Infrastructure,37,16,11.3,-4.7,-1.73,,thin
+Berea,Kanana,LSD08,Educational,37,6,13.92,7.92,2.77,gap,thin
+Berea,Kanana,LSD08,Retail,37,6,3.82,-2.18,-1.19,,thin
+Berea,Kanana,LSD08,Other,37,2,1.78,-0.22,-0.17,,thin
+Berea,Kanana,LSD08,Food & Beverage,37,1,0.92,-0.08,-0.09,,thin
+Berea,Kanana,LSD08,Tourism,37,1,1.23,0.23,0.21,,thin
+Berea,Kanana,LSD08,Religious,37,2,3.01,1.01,0.61,,thin
+Berea,Kanana,LSD08,Healthcare,37,3,1.03,-1.97,-1.98,,thin
+Berea,Maseru (Berea Distict),LSD09,Infrastructure,272,115,118.89,3.89,0.5,,thin
+Berea,Maseru (Berea Distict),LSD09,Educational,272,26,33.47,7.47,1.41,,thin
+Berea,Maseru (Berea Distict),LSD09,Retail,272,90,70.83,-19.17,-2.79,cluster,thin
+Berea,Maseru (Berea Distict),LSD09,Other,272,7,10.41,3.41,1.08,,thin
+Berea,Maseru (Berea Distict),LSD09,Food & Beverage,272,10,10.24,0.24,0.08,,thin
+Berea,Maseru (Berea Distict),LSD09,Tourism,272,6,8.77,2.77,0.95,,thin
+Berea,Maseru (Berea Distict),LSD09,Religious,272,14,14.09,0.09,0.02,,thin
+Berea,Maseru (Berea Distict),LSD09,Healthcare,272,4,5.3,1.3,0.57,,thin
+Berea,Tayateyaneng,LSD10,Infrastructure,237,35,63.77,28.77,4.55,gap,
+Berea,Tayateyaneng,LSD10,Educational,237,23,16.58,-6.42,-1.76,,
+Berea,Tayateyaneng,LSD10,Retail,237,102,104.18,2.18,0.33,,
+Berea,Tayateyaneng,LSD10,Other,237,20,17.41,-2.59,-0.65,,
+Berea,Tayateyaneng,LSD10,Food & Beverage,237,24,10.78,-13.22,-4.14,cluster,
+Berea,Tayateyaneng,LSD10,Tourism,237,10,8.96,-1.04,-0.36,,
+Berea,Tayateyaneng,LSD10,Religious,237,13,10.83,-2.17,-0.68,,
+Berea,Tayateyaneng,LSD10,Healthcare,237,10,4.5,-5.5,-2.62,cluster,
+Mafeteng,Metsi-Maholo,LSE01,Infrastructure,23,4,5.47,1.47,0.72,,
+Mafeteng,Metsi-Maholo,LSE01,Educational,23,12,12.59,0.59,0.26,,
+Mafeteng,Metsi-Maholo,LSE01,Retail,23,0,1.43,1.43,1.26,,
+Mafeteng,Metsi-Maholo,LSE01,Other,23,5,1.45,-3.55,-3.08,cluster,
+Mafeteng,Metsi-Maholo,LSE01,Food & Beverage,23,0,0.38,0.38,0.63,,
+Mafeteng,Metsi-Maholo,LSE01,Tourism,23,0,0.55,0.55,0.75,,
+Mafeteng,Metsi-Maholo,LSE01,Religious,23,0,0.66,0.66,0.83,,
+Mafeteng,Metsi-Maholo,LSE01,Healthcare,23,2,0.47,-1.53,-2.26,,
+Mafeteng,Mamants'o,LSE02,Infrastructure,51,14,18.89,4.89,1.49,,
+Mafeteng,Mamants'o,LSE02,Educational,51,12,11.37,-0.63,-0.29,,
+Mafeteng,Mamants'o,LSE02,Retail,51,17,11.99,-5.01,-1.79,,
+Mafeteng,Mamants'o,LSE02,Other,51,3,2.85,-0.15,-0.1,,
+Mafeteng,Mamants'o,LSE02,Food & Beverage,51,2,1.85,-0.15,-0.12,,
+Mafeteng,Mamants'o,LSE02,Tourism,51,1,0.7,-0.3,-0.36,,
+Mafeteng,Mamants'o,LSE02,Religious,51,0,1.62,1.62,1.31,,
+Mafeteng,Mamants'o,LSE02,Healthcare,51,2,1.73,-0.27,-0.21,,
+Mafeteng,Ramoetsana,LSE03,Infrastructure,33,12,8.48,-3.52,-1.42,,
+Mafeteng,Ramoetsana,LSE03,Educational,33,16,17.23,1.23,0.45,,
+Mafeteng,Ramoetsana,LSE03,Retail,33,3,1.82,-1.18,-0.91,,
+Mafeteng,Ramoetsana,LSE03,Other,33,1,2.22,1.22,0.87,,
+Mafeteng,Ramoetsana,LSE03,Food & Beverage,33,0,0.43,0.43,0.66,,
+Mafeteng,Ramoetsana,LSE03,Tourism,33,0,0.73,0.73,0.87,,
+Mafeteng,Ramoetsana,LSE03,Religious,33,0,1.32,1.32,1.19,,
+Mafeteng,Ramoetsana,LSE03,Healthcare,33,1,0.78,-0.22,-0.26,,
+Mafeteng,Lehlakaneng,LSE04,Infrastructure,20,4,4.9,0.9,0.49,,
+Mafeteng,Lehlakaneng,LSE04,Educational,20,7,7.68,0.68,0.37,,
+Mafeteng,Lehlakaneng,LSE04,Retail,20,3,2.71,-0.29,-0.21,,
+Mafeteng,Lehlakaneng,LSE04,Other,20,0,1.98,1.98,1.57,,
+Mafeteng,Lehlakaneng,LSE04,Food & Beverage,20,2,0.69,-1.31,-1.64,,
+Mafeteng,Lehlakaneng,LSE04,Tourism,20,3,1.0,-2.0,-2.13,,
+Mafeteng,Lehlakaneng,LSE04,Religious,20,0,0.52,0.52,0.73,,
+Mafeteng,Lehlakaneng,LSE04,Healthcare,20,1,0.52,-0.48,-0.69,,
+Mafeteng,Makoabating,LSE05,Infrastructure,28,17,11.52,-5.48,-2.43,cluster,thin
+Mafeteng,Makoabating,LSE05,Educational,28,10,12.22,2.22,1.14,,thin
+Mafeteng,Makoabating,LSE05,Retail,28,0,1.85,1.85,1.45,,thin
+Mafeteng,Makoabating,LSE05,Other,28,0,1.09,1.09,1.08,,thin
+Mafeteng,Makoabating,LSE05,Food & Beverage,28,0,0.29,0.29,0.54,,thin
+Mafeteng,Makoabating,LSE05,Tourism,28,0,0.21,0.21,0.47,,thin
+Mafeteng,Makoabating,LSE05,Religious,28,1,0.5,-0.5,-0.72,,thin
+Mafeteng,Makoabating,LSE05,Healthcare,28,0,0.33,0.33,0.58,,thin
+Mafeteng,Tsana-Talana,LSE06,Infrastructure,17,3,3.27,0.27,0.17,,
+Mafeteng,Tsana-Talana,LSE06,Educational,17,13,11.05,-1.95,-1.04,,
+Mafeteng,Tsana-Talana,LSE06,Retail,17,1,0.7,-0.3,-0.37,,
+Mafeteng,Tsana-Talana,LSE06,Other,17,0,0.54,0.54,0.75,,
+Mafeteng,Tsana-Talana,LSE06,Food & Beverage,17,0,0.15,0.15,0.39,,
+Mafeteng,Tsana-Talana,LSE06,Tourism,17,0,0.19,0.19,0.44,,
+Mafeteng,Tsana-Talana,LSE06,Religious,17,0,0.9,0.9,0.98,,
+Mafeteng,Tsana-Talana,LSE06,Healthcare,17,0,0.18,0.18,0.43,,
+Mafeteng,Qibing,LSE07,Infrastructure,40,9,10.96,1.96,0.71,,
+Mafeteng,Qibing,LSE07,Educational,40,19,18.34,-0.66,-0.25,,
+Mafeteng,Qibing,LSE07,Retail,40,4,4.59,0.59,0.32,,
+Mafeteng,Qibing,LSE07,Other,40,3,1.45,-1.55,-1.32,,
+Mafeteng,Qibing,LSE07,Food & Beverage,40,4,0.82,-3.18,-3.59,cluster,
+Mafeteng,Qibing,LSE07,Tourism,40,0,0.89,0.89,0.96,,
+Mafeteng,Qibing,LSE07,Religious,40,1,1.94,0.94,0.72,,
+Mafeteng,Qibing,LSE07,Healthcare,40,0,1.01,1.01,1.03,,
+Mafeteng,Mafeteng,LSE08,Infrastructure,155,31,37.56,6.56,1.27,,
+Mafeteng,Mafeteng,LSE08,Educational,155,16,19.42,3.42,0.87,,
+Mafeteng,Mafeteng,LSE08,Retail,155,71,62.37,-8.63,-1.55,,
+Mafeteng,Mafeteng,LSE08,Other,155,14,8.4,-5.6,-2.01,cluster,
+Mafeteng,Mafeteng,LSE08,Food & Beverage,155,6,5.36,-0.64,-0.28,,
+Mafeteng,Mafeteng,LSE08,Tourism,155,3,6.73,3.73,1.47,,
+Mafeteng,Mafeteng,LSE08,Religious,155,12,12.48,0.48,0.15,,
+Mafeteng,Mafeteng,LSE08,Healthcare,155,2,2.69,0.69,0.43,,
+Mohale's Hoek,Siloe,LSF01,Infrastructure,37,8,7.54,-0.46,-0.19,,
+Mohale's Hoek,Siloe,LSF01,Educational,37,23,21.55,-1.45,-0.5,,
+Mohale's Hoek,Siloe,LSF01,Retail,37,2,2.19,0.19,0.13,,
+Mohale's Hoek,Siloe,LSF01,Other,37,2,1.82,-0.18,-0.14,,
+Mohale's Hoek,Siloe,LSF01,Food & Beverage,37,0,0.59,0.59,0.77,,
+Mohale's Hoek,Siloe,LSF01,Tourism,37,0,1.04,1.04,1.04,,
+Mohale's Hoek,Siloe,LSF01,Religious,37,1,1.46,0.46,0.39,,
+Mohale's Hoek,Siloe,LSF01,Healthcare,37,1,0.8,-0.2,-0.22,,
+Mohale's Hoek,Mashaleng,LSF02,Infrastructure,6,1,1.03,0.03,0.03,,thin
+Mohale's Hoek,Mashaleng,LSF02,Educational,6,5,4.62,-0.38,-0.37,,thin
+Mohale's Hoek,Mashaleng,LSF02,Retail,6,0,0.06,0.06,0.25,,thin
+Mohale's Hoek,Mashaleng,LSF02,Other,6,0,0.07,0.07,0.27,,thin
+Mohale's Hoek,Mashaleng,LSF02,Food & Beverage,6,0,0.03,0.03,0.18,,thin
+Mohale's Hoek,Mashaleng,LSF02,Tourism,6,0,0.06,0.06,0.25,,thin
+Mohale's Hoek,Mashaleng,LSF02,Religious,6,0,0.09,0.09,0.3,,thin
+Mohale's Hoek,Mashaleng,LSF02,Healthcare,6,0,0.04,0.04,0.19,,thin
+Mohale's Hoek,Khoelenya,LSF03,Infrastructure,42,7,8.61,1.61,0.63,,
+Mohale's Hoek,Khoelenya,LSF03,Educational,42,26,25.78,-0.22,-0.07,,
+Mohale's Hoek,Khoelenya,LSF03,Retail,42,4,1.99,-2.01,-1.49,,
+Mohale's Hoek,Khoelenya,LSF03,Other,42,1,1.84,0.84,0.64,,
+Mohale's Hoek,Khoelenya,LSF03,Food & Beverage,42,0,0.56,0.56,0.75,,
+Mohale's Hoek,Khoelenya,LSF03,Tourism,42,0,0.69,0.69,0.84,,
+Mohale's Hoek,Khoelenya,LSF03,Religious,42,3,1.66,-1.34,-1.07,,
+Mohale's Hoek,Khoelenya,LSF03,Healthcare,42,1,0.88,-0.12,-0.13,,
+Mohale's Hoek,Lithipeng,LSF04,Infrastructure,21,3,2.95,-0.05,-0.03,,
+Mohale's Hoek,Lithipeng,LSF04,Educational,21,16,16.21,0.21,0.11,,
+Mohale's Hoek,Lithipeng,LSF04,Retail,21,0,0.36,0.36,0.61,,
+Mohale's Hoek,Lithipeng,LSF04,Other,21,1,0.36,-0.64,-1.06,,
+Mohale's Hoek,Lithipeng,LSF04,Food & Beverage,21,0,0.11,0.11,0.33,,
+Mohale's Hoek,Lithipeng,LSF04,Tourism,21,0,0.21,0.21,0.46,,
+Mohale's Hoek,Lithipeng,LSF04,Religious,21,0,0.53,0.53,0.75,,
+Mohale's Hoek,Lithipeng,LSF04,Healthcare,21,1,0.26,-0.74,-1.46,,
+Mohale's Hoek,Thaba-Mokhele,LSF05,Infrastructure,30,4,6.22,2.22,1.02,,
+Mohale's Hoek,Thaba-Mokhele,LSF05,Educational,30,25,19.63,-5.37,-2.15,cluster,
+Mohale's Hoek,Thaba-Mokhele,LSF05,Retail,30,0,0.88,0.88,0.96,,
+Mohale's Hoek,Thaba-Mokhele,LSF05,Other,30,1,0.87,-0.13,-0.14,,
+Mohale's Hoek,Thaba-Mokhele,LSF05,Food & Beverage,30,0,0.31,0.31,0.56,,
+Mohale's Hoek,Thaba-Mokhele,LSF05,Tourism,30,0,0.6,0.6,0.79,,
+Mohale's Hoek,Thaba-Mokhele,LSF05,Religious,30,0,1.0,1.0,1.02,,
+Mohale's Hoek,Thaba-Mokhele,LSF05,Healthcare,30,0,0.48,0.48,0.7,,
+Mohale's Hoek,Qhoasing,LSF06,Infrastructure,48,8,10.11,2.11,0.76,,
+Mohale's Hoek,Qhoasing,LSF06,Educational,48,36,33.53,-2.47,-0.8,,
+Mohale's Hoek,Qhoasing,LSF06,Retail,48,0,0.95,0.95,0.99,,
+Mohale's Hoek,Qhoasing,LSF06,Other,48,1,1.09,0.09,0.09,,
+Mohale's Hoek,Qhoasing,LSF06,Food & Beverage,48,0,0.29,0.29,0.54,,
+Mohale's Hoek,Qhoasing,LSF06,Tourism,48,2,0.86,-1.14,-1.25,,
+Mohale's Hoek,Qhoasing,LSF06,Religious,48,0,0.54,0.54,0.74,,
+Mohale's Hoek,Qhoasing,LSF06,Healthcare,48,1,0.63,-0.37,-0.47,,
+Mohale's Hoek,Senqunyane,LSF07,Infrastructure,47,16,12.29,-3.71,-1.25,,
+Mohale's Hoek,Senqunyane,LSF07,Educational,47,26,27.8,1.8,0.56,,
+Mohale's Hoek,Senqunyane,LSF07,Retail,47,2,2.19,0.19,0.14,,
+Mohale's Hoek,Senqunyane,LSF07,Other,47,0,1.5,1.5,1.27,,
+Mohale's Hoek,Senqunyane,LSF07,Food & Beverage,47,0,0.57,0.57,0.76,,
+Mohale's Hoek,Senqunyane,LSF07,Tourism,47,2,1.2,-0.8,-0.74,,
+Mohale's Hoek,Senqunyane,LSF07,Religious,47,0,0.61,0.61,0.79,,
+Mohale's Hoek,Senqunyane,LSF07,Healthcare,47,1,0.84,-0.16,-0.18,,
+Mohale's Hoek,Mohale's Hoek,LSF08,Infrastructure,121,30,36.43,6.43,1.34,,
+Mohale's Hoek,Mohale's Hoek,LSF08,Educational,121,27,28.34,1.34,0.32,,
+Mohale's Hoek,Mohale's Hoek,LSF08,Retail,121,34,29.15,-4.85,-1.14,,
+Mohale's Hoek,Mohale's Hoek,LSF08,Other,121,10,9.73,-0.27,-0.09,,
+Mohale's Hoek,Mohale's Hoek,LSF08,Food & Beverage,121,7,4.46,-2.54,-1.24,,
+Mohale's Hoek,Mohale's Hoek,LSF08,Tourism,121,3,4.72,1.72,0.81,,
+Mohale's Hoek,Mohale's Hoek,LSF08,Religious,121,5,5.45,0.45,0.2,,
+Mohale's Hoek,Mohale's Hoek,LSF08,Healthcare,121,5,2.73,-2.27,-1.4,,
+Quthing,Mjanyane,LSG01,Infrastructure,29,3,3.36,0.36,0.21,,
+Quthing,Mjanyane,LSG01,Educational,29,20,20.68,0.68,0.29,,
+Quthing,Mjanyane,LSG01,Retail,29,1,1.06,0.06,0.06,,
+Quthing,Mjanyane,LSG01,Other,29,2,0.78,-1.22,-1.4,,
+Quthing,Mjanyane,LSG01,Food & Beverage,29,1,0.36,-0.64,-1.07,,
+Quthing,Mjanyane,LSG01,Tourism,29,0,0.55,0.55,0.75,,
+Quthing,Mjanyane,LSG01,Religious,29,1,1.67,0.67,0.54,,
+Quthing,Mjanyane,LSG01,Healthcare,29,1,0.52,-0.48,-0.67,,
+Quthing,Qomoqomong,LSG02,Infrastructure,12,2,1.24,-0.76,-0.73,,
+Quthing,Qomoqomong,LSG02,Educational,12,10,8.18,-1.82,-1.19,,
+Quthing,Qomoqomong,LSG02,Retail,12,0,0.53,0.53,0.77,,
+Quthing,Qomoqomong,LSG02,Other,12,0,0.65,0.65,0.85,,
+Quthing,Qomoqomong,LSG02,Food & Beverage,12,0,0.16,0.16,0.4,,
+Quthing,Qomoqomong,LSG02,Tourism,12,0,0.18,0.18,0.43,,
+Quthing,Qomoqomong,LSG02,Religious,12,0,0.74,0.74,0.9,,
+Quthing,Qomoqomong,LSG02,Healthcare,12,0,0.33,0.33,0.59,,
+Quthing,Tosing,LSG03,Infrastructure,41,4,5.85,1.85,0.84,,
+Quthing,Tosing,LSG03,Educational,41,29,29.06,0.06,0.02,,
+Quthing,Tosing,LSG03,Retail,41,4,1.53,-2.47,-2.07,cluster,
+Quthing,Tosing,LSG03,Other,41,0,0.99,0.99,1.02,,
+Quthing,Tosing,LSG03,Food & Beverage,41,0,0.31,0.31,0.56,,
+Quthing,Tosing,LSG03,Tourism,41,0,0.66,0.66,0.82,,
+Quthing,Tosing,LSG03,Religious,41,2,1.55,-0.45,-0.37,,
+Quthing,Tosing,LSG03,Healthcare,41,2,1.06,-0.94,-0.94,,
+Quthing,Telle,LSG04,Infrastructure,75,8,13.05,5.05,1.57,,
+Quthing,Telle,LSG04,Educational,75,38,38.91,0.91,0.25,,
+Quthing,Telle,LSG04,Retail,75,14,9.4,-4.6,-1.78,,
+Quthing,Telle,LSG04,Other,75,6,5.22,-0.78,-0.38,,
+Quthing,Telle,LSG04,Food & Beverage,75,0,1.37,1.37,1.2,,
+Quthing,Telle,LSG04,Tourism,75,2,2.81,0.81,0.5,,
+Quthing,Telle,LSG04,Religious,75,3,2.33,-0.67,-0.45,,
+Quthing,Telle,LSG04,Healthcare,75,4,1.9,-2.1,-1.56,,
+Quthing,Mphaki,LSG05,Infrastructure,44,4,6.71,2.71,1.17,,
+Quthing,Mphaki,LSG05,Educational,44,19,19.32,0.32,0.12,,
+Quthing,Mphaki,LSG05,Retail,44,16,10.57,-5.43,-2.62,cluster,
+Quthing,Mphaki,LSG05,Other,44,1,3.33,2.33,1.42,,
+Quthing,Mphaki,LSG05,Food & Beverage,44,0,0.85,0.85,0.94,,
+Quthing,Mphaki,LSG05,Tourism,44,1,1.08,0.08,0.08,,
+Quthing,Mphaki,LSG05,Religious,44,2,1.0,-1.0,-1.02,,
+Quthing,Mphaki,LSG05,Healthcare,44,1,1.13,0.13,0.12,,
+Quthing,Quthing,LSG06,Infrastructure,129,24,26.21,2.21,0.51,,
+Quthing,Quthing,LSG06,Educational,129,33,27.18,-5.82,-1.47,,
+Quthing,Quthing,LSG06,Retail,129,33,48.38,15.38,3.17,gap,
+Quthing,Quthing,LSG06,Other,129,10,5.3,-4.7,-2.11,cluster,
+Quthing,Quthing,LSG06,Food & Beverage,129,4,8.01,4.01,1.5,,
+Quthing,Quthing,LSG06,Tourism,129,8,3.04,-4.96,-2.88,cluster,
+Quthing,Quthing,LSG06,Religious,129,10,8.72,-1.28,-0.47,,
+Quthing,Quthing,LSG06,Healthcare,129,7,2.16,-4.84,-3.33,cluster,
+Qacha's Nek,Qanya,LSH01,Infrastructure,42,12,9.39,-2.61,-0.98,,
+Qacha's Nek,Qanya,LSH01,Educational,42,26,26.49,0.49,0.16,,
+Qacha's Nek,Qanya,LSH01,Retail,42,0,1.34,1.34,1.19,,
+Qacha's Nek,Qanya,LSH01,Other,42,2,1.51,-0.49,-0.41,,
+Qacha's Nek,Qanya,LSH01,Food & Beverage,42,0,0.39,0.39,0.63,,
+Qacha's Nek,Qanya,LSH01,Tourism,42,1,1.13,0.13,0.12,,
+Qacha's Nek,Qanya,LSH01,Religious,42,0,0.79,0.79,0.9,,
+Qacha's Nek,Qanya,LSH01,Healthcare,42,1,0.97,-0.03,-0.03,,
+Qacha's Nek,Ntsupe,LSH02,Infrastructure,51,7,11.18,4.18,1.44,,
+Qacha's Nek,Ntsupe,LSH02,Educational,51,38,33.83,-4.17,-1.26,,
+Qacha's Nek,Ntsupe,LSH02,Retail,51,0,1.22,1.22,1.13,,
+Qacha's Nek,Ntsupe,LSH02,Other,51,0,1.38,1.38,1.21,,
+Qacha's Nek,Ntsupe,LSH02,Food & Beverage,51,0,0.51,0.51,0.72,,
+Qacha's Nek,Ntsupe,LSH02,Tourism,51,1,1.02,0.02,0.02,,
+Qacha's Nek,Ntsupe,LSH02,Religious,51,0,0.76,0.76,0.88,,
+Qacha's Nek,Ntsupe,LSH02,Healthcare,51,5,1.1,-3.9,-3.79,cluster,
+Qacha's Nek,Tsoelikana,LSH03,Infrastructure,75,9,18.56,9.56,2.64,gap,
+Qacha's Nek,Tsoelikana,LSH03,Educational,75,48,39.79,-8.21,-2.11,cluster,
+Qacha's Nek,Tsoelikana,LSH03,Retail,75,2,1.77,-0.23,-0.18,,
+Qacha's Nek,Tsoelikana,LSH03,Other,75,3,1.72,-1.28,-0.99,,
+Qacha's Nek,Tsoelikana,LSH03,Food & Beverage,75,0,0.96,0.96,0.99,,
+Qacha's Nek,Tsoelikana,LSH03,Tourism,75,12,9.8,-2.2,-0.99,,
+Qacha's Nek,Tsoelikana,LSH03,Religious,75,0,1.26,1.26,1.13,,
+Qacha's Nek,Tsoelikana,LSH03,Healthcare,75,1,1.15,0.15,0.14,,
+Qacha's Nek,Qacha's Nek,LSH04,Infrastructure,137,59,36.71,-22.29,-4.68,cluster,
+Qacha's Nek,Qacha's Nek,LSH04,Educational,137,13,20.94,7.94,1.96,,
+Qacha's Nek,Qacha's Nek,LSH04,Retail,137,31,24.83,-6.17,-1.41,,
+Qacha's Nek,Qacha's Nek,LSH04,Other,137,9,27.73,18.73,4.33,gap,
+Qacha's Nek,Qacha's Nek,LSH04,Food & Beverage,137,9,5.11,-3.89,-1.77,,
+Qacha's Nek,Qacha's Nek,LSH04,Tourism,137,8,13.03,5.03,1.49,,
+Qacha's Nek,Qacha's Nek,LSH04,Religious,137,5,4.72,-0.28,-0.13,,
+Qacha's Nek,Qacha's Nek,LSH04,Healthcare,137,3,3.93,0.93,0.48,,
+Mokhotlong,Seate,LSJ01,Infrastructure,107,59,62.27,3.27,0.73,,thin
+Mokhotlong,Seate,LSJ01,Educational,107,32,29.29,-2.71,-0.68,,thin
+Mokhotlong,Seate,LSJ01,Retail,107,6,2.82,-3.18,-1.93,,thin
+Mokhotlong,Seate,LSJ01,Other,107,3,1.94,-1.06,-0.77,,thin
+Mokhotlong,Seate,LSJ01,Food & Beverage,107,0,1.22,1.22,1.11,,thin
+Mokhotlong,Seate,LSJ01,Tourism,107,3,6.24,3.24,1.37,,thin
+Mokhotlong,Seate,LSJ01,Religious,107,2,2.19,0.19,0.13,,thin
+Mokhotlong,Seate,LSJ01,Healthcare,107,2,1.02,-0.98,-0.97,,thin
+Mokhotlong,Mphokojoana,LSJ02,Infrastructure,69,19,24.25,5.25,1.39,,
+Mokhotlong,Mphokojoana,LSJ02,Educational,69,40,35.52,-4.48,-1.14,,
+Mokhotlong,Mphokojoana,LSJ02,Retail,69,1,1.41,0.41,0.35,,
+Mokhotlong,Mphokojoana,LSJ02,Other,69,1,1.31,0.31,0.27,,
+Mokhotlong,Mphokojoana,LSJ02,Food & Beverage,69,0,0.75,0.75,0.87,,
+Mokhotlong,Mphokojoana,LSJ02,Tourism,69,6,3.28,-2.72,-1.58,,
+Mokhotlong,Mphokojoana,LSJ02,Religious,69,2,1.49,-0.51,-0.43,,
+Mokhotlong,Mphokojoana,LSJ02,Healthcare,69,0,0.98,0.98,1.0,,
+Mokhotlong,Sanqebethu,LSJ03,Infrastructure,28,10,8.56,-1.44,-0.62,,
+Mokhotlong,Sanqebethu,LSJ03,Educational,28,16,16.35,0.35,0.14,,
+Mokhotlong,Sanqebethu,LSJ03,Retail,28,0,0.47,0.47,0.69,,
+Mokhotlong,Sanqebethu,LSJ03,Other,28,0,0.54,0.54,0.75,,
+Mokhotlong,Sanqebethu,LSJ03,Food & Beverage,28,1,0.31,-0.69,-1.25,,
+Mokhotlong,Sanqebethu,LSJ03,Tourism,28,0,0.62,0.62,0.8,,
+Mokhotlong,Sanqebethu,LSJ03,Religious,28,0,0.75,0.75,0.88,,
+Mokhotlong,Sanqebethu,LSJ03,Healthcare,28,1,0.4,-0.6,-0.96,,
+Mokhotlong,Menoaneng,LSJ04,Infrastructure,89,41,34.2,-6.8,-1.72,,thin
+Mokhotlong,Menoaneng,LSJ04,Educational,89,31,34.68,3.68,0.95,,thin
+Mokhotlong,Menoaneng,LSJ04,Retail,89,5,7.05,2.05,0.85,,thin
+Mokhotlong,Menoaneng,LSJ04,Other,89,1,3.22,2.22,1.29,,thin
+Mokhotlong,Menoaneng,LSJ04,Food & Beverage,89,1,2.01,1.01,0.73,,thin
+Mokhotlong,Menoaneng,LSJ04,Tourism,89,5,3.11,-1.89,-1.1,,thin
+Mokhotlong,Menoaneng,LSJ04,Religious,89,3,3.11,0.11,0.07,,thin
+Mokhotlong,Menoaneng,LSJ04,Healthcare,89,2,1.61,-0.39,-0.31,,thin
+Mokhotlong,Mokhotlong,LSJ05,Infrastructure,75,25,25.1,0.1,0.02,,
+Mokhotlong,Mokhotlong,LSJ05,Educational,75,11,19.1,8.1,2.25,gap,
+Mokhotlong,Mokhotlong,LSJ05,Retail,75,11,13.3,2.3,0.72,,
+Mokhotlong,Mokhotlong,LSJ05,Other,75,8,3.86,-4.14,-2.2,cluster,
+Mokhotlong,Mokhotlong,LSJ05,Food & Beverage,75,3,3.87,0.87,0.46,,
+Mokhotlong,Mokhotlong,LSJ05,Tourism,75,9,3.58,-5.42,-2.96,cluster,
+Mokhotlong,Mokhotlong,LSJ05,Religious,75,7,4.11,-2.89,-1.47,,
+Mokhotlong,Mokhotlong,LSJ05,Healthcare,75,1,2.08,1.08,0.76,,
+Thaba-Tseka,Tenesolo,LSK01,Infrastructure,89,38,37.94,-0.06,-0.01,,thin
+Thaba-Tseka,Tenesolo,LSK01,Educational,89,30,27.92,-2.08,-0.52,,thin
+Thaba-Tseka,Tenesolo,LSK01,Retail,89,3,7.39,4.39,1.79,,thin
+Thaba-Tseka,Tenesolo,LSK01,Other,89,7,4.81,-2.19,-1.04,,thin
+Thaba-Tseka,Tenesolo,LSK01,Food & Beverage,89,3,1.94,-1.06,-0.77,,thin
+Thaba-Tseka,Tenesolo,LSK01,Tourism,89,4,5.26,1.26,0.57,,thin
+Thaba-Tseka,Tenesolo,LSK01,Religious,89,2,2.31,0.31,0.21,,thin
+Thaba-Tseka,Tenesolo,LSK01,Healthcare,89,2,1.42,-0.58,-0.5,,thin
+Thaba-Tseka,Khutlo-se-Metsi,LSK02,Infrastructure,55,25,18.74,-6.26,-1.91,,thin
+Thaba-Tseka,Khutlo-se-Metsi,LSK02,Educational,55,29,27.12,-1.88,-0.56,,thin
+Thaba-Tseka,Khutlo-se-Metsi,LSK02,Retail,55,0,1.95,1.95,1.45,,thin
+Thaba-Tseka,Khutlo-se-Metsi,LSK02,Other,55,0,2.13,2.13,1.52,,thin
+Thaba-Tseka,Khutlo-se-Metsi,LSK02,Food & Beverage,55,0,0.84,0.84,0.93,,thin
+Thaba-Tseka,Khutlo-se-Metsi,LSK02,Tourism,55,0,2.39,2.39,1.61,,thin
+Thaba-Tseka,Khutlo-se-Metsi,LSK02,Religious,55,0,0.83,0.83,0.92,,thin
+Thaba-Tseka,Khutlo-se-Metsi,LSK02,Healthcare,55,1,1.0,0.0,0.0,,thin
+Thaba-Tseka,Litsoetse,LSK03,Infrastructure,32,8,8.99,0.99,0.41,,
+Thaba-Tseka,Litsoetse,LSK03,Educational,32,19,19.28,0.28,0.11,,
+Thaba-Tseka,Litsoetse,LSK03,Retail,32,0,0.69,0.69,0.85,,
+Thaba-Tseka,Litsoetse,LSK03,Other,32,0,0.74,0.74,0.88,,
+Thaba-Tseka,Litsoetse,LSK03,Food & Beverage,32,3,0.42,-2.58,-4.06,cluster,
+Thaba-Tseka,Litsoetse,LSK03,Tourism,32,0,0.6,0.6,0.78,,
+Thaba-Tseka,Litsoetse,LSK03,Religious,32,1,0.79,-0.21,-0.25,,
+Thaba-Tseka,Litsoetse,LSK03,Healthcare,32,1,0.51,-0.49,-0.71,,
+Thaba-Tseka,Bokong,LSK04,Infrastructure,80,34,33.93,-0.07,-0.02,,thin
+Thaba-Tseka,Bokong,LSK04,Educational,80,37,34.78,-2.22,-0.6,,thin
+Thaba-Tseka,Bokong,LSK04,Retail,80,2,2.59,0.59,0.38,,thin
+Thaba-Tseka,Bokong,LSK04,Other,80,1,1.77,0.77,0.59,,thin
+Thaba-Tseka,Bokong,LSK04,Food & Beverage,80,0,1.43,1.43,1.21,,thin
+Thaba-Tseka,Bokong,LSK04,Tourism,80,4,3.09,-0.91,-0.53,,thin
+Thaba-Tseka,Bokong,LSK04,Religious,80,0,1.43,1.43,1.21,,thin
+Thaba-Tseka,Bokong,LSK04,Healthcare,80,2,0.97,-1.03,-1.05,,thin
+Thaba-Tseka,Linakeng,LSK05,Infrastructure,70,17,16.35,-0.65,-0.19,,
+Thaba-Tseka,Linakeng,LSK05,Educational,70,37,39.28,2.28,0.6,,
+Thaba-Tseka,Linakeng,LSK05,Retail,70,0,2.17,2.17,1.53,,
+Thaba-Tseka,Linakeng,LSK05,Other,70,4,2.34,-1.66,-1.14,,
+Thaba-Tseka,Linakeng,LSK05,Food & Beverage,70,5,1.11,-3.89,-3.74,cluster,
+Thaba-Tseka,Linakeng,LSK05,Tourism,70,4,6.08,2.08,1.11,,
+Thaba-Tseka,Linakeng,LSK05,Religious,70,1,1.19,0.19,0.18,,
+Thaba-Tseka,Linakeng,LSK05,Healthcare,70,2,1.48,-0.52,-0.43,,
+Thaba-Tseka,Thaba-Tseka,LSK06,Infrastructure,85,28,32.56,4.56,1.05,,
+Thaba-Tseka,Thaba-Tseka,LSK06,Educational,85,16,20.2,4.2,1.11,,
+Thaba-Tseka,Thaba-Tseka,LSK06,Retail,85,14,11.34,-2.66,-0.88,,
+Thaba-Tseka,Thaba-Tseka,LSK06,Other,85,10,4.91,-5.09,-2.41,cluster,
+Thaba-Tseka,Thaba-Tseka,LSK06,Food & Beverage,85,2,3.51,1.51,0.83,,
+Thaba-Tseka,Thaba-Tseka,LSK06,Tourism,85,8,6.39,-1.61,-0.67,,
+Thaba-Tseka,Thaba-Tseka,LSK06,Religious,85,4,4.1,0.1,0.05,,
+Thaba-Tseka,Thaba-Tseka,LSK06,Healthcare,85,3,1.99,-1.01,-0.73,,
