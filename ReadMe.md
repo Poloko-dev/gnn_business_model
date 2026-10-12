@@ -18,7 +18,7 @@ processed_poi.csv              6,083 nodes x 43 columns
         ▼
 poi_engineered.csv             6,083 nodes x 92 columns (66 model features)
         │  Stage 5: gnn_location_model.ipynb (dual-mode GraphSAGE, evaluation, ablations, RO2/RO3)
-        ▼                (Stage 4, model.ipynb, was the first design and is kept for the record)
+        ▼                (Stage 4, the first design, was retired; see git history)
 model_outputs_v2/              25 trained models, predictions in both modes, market gaps, metrics
         │  Stage 6: predict_poi.py (score a candidate site, suggest sites, market gaps)
 ```
@@ -28,14 +28,11 @@ model_outputs_v2/              25 trained models, predictions in both modes, mar
 | File | What it is |
 |---|---|
 | `points_of_interest.geojson` | Original export, from `../hotosm_lso_points_of_interest_osm_geojson.zip` |
-| `README.txt`, `config.yaml`, `metadata.json` | The export tool's own notes, query configuration and column profile |
 | `points_of_interest.csv` | Stage 1 output: the GeoJSON as a flat table |
 | `poi_eda.ipynb` | Stage 2 notebook: exploratory analysis and cleaning |
 | `processed_poi.csv` | Stage 2 output: one cleaned row per graph node |
 | `poi_feature_engineering.ipynb` | Stage 3 notebook: feature engineering |
 | `poi_engineered.csv` | Stage 3 output: the table the GNN is trained on |
-| `poi_engineered_vis.ipynb` | Visual analysis of the engineered features, which informed the model design |
-| `model.ipynb`, `model_outputs/` | Model iteration 1: GraphSAGE that relies on how each POI is mapped (test macro-F1 0.375); kept as the record of the first design cycle |
 | `gnn_location_model.ipynb` | Model iteration 2: one GraphSAGE trained in two modes (known POI / candidate site), with architecture comparison, tuning, ablations, RO2 (what shapes an area) and RO3 (market gaps) |
 | `model_outputs_v2/` | Iteration 2 outputs: `gnn_dual_models.pt` (25 models), out-of-fold and unlabelled predictions in both modes, `market_gaps.csv`, `metrics.json`, training log |
 | `predict_poi.py` | Command-line tool on the iteration 2 model: `site`, `suggest`, `gaps`, `new`, `existing`, `batch`, and `--check` against the notebook (run `python predict_poi.py -h`) |
@@ -48,7 +45,7 @@ model_outputs_v2/              25 trained models, predictions in both modes, mar
 produced with `oex` 0.4.13 on 2026-09-09 from the OSM snapshot of 2026-09-08. It contains every OSM feature tagged
 with `amenity`, `shop`, `tourism` or `man_made` inside the geoBoundaries outline of Lesotho: 12,536 features
 (5,372 points, 6,880 polygons, 284 lines) in WGS84 longitude/latitude. The export tool attached the district
-(`adm1_*`) and sub-district (`adm2_*`) codes and names; `config.yaml` lists the OSM tags it selected.
+(`adm1_*`) and sub-district (`adm2_*`) codes and names.
 
 **What the conversion did.** Each GeoJSON feature became one CSV row, in the same order. The 27 attribute columns were
 copied unchanged (OSM `null` becomes an empty cell), and four columns were added so the geometry can be used without
@@ -229,7 +226,7 @@ Results should be reported with and without the three columns whose names contai
 
 ---
 
-## Stage 4: model iteration 1 (`model.ipynb` → `model_outputs/`)
+## Stage 4: model iteration 1 (retired)
 
 The first model was a GraphSAGE network (with a separate weight for the node itself, residual layers and jumping
 knowledge; GAT was tested and lost) trained on all 66 features, with the label trick and validation-fitted class
@@ -240,7 +237,8 @@ Its ablations showed where that score came from. Without the 8 `attr_` features 
 (named or not, outline or point, address, opening hours). Those attributes do not exist for an empty candidate site,
 so this model could not score a location where no business stands yet, which is what the study's aim (market gaps,
 suitable areas) needs. In design-science terms, its evaluation fed back into a second design (Stage 5). The notebook
-and its outputs are kept unchanged as the record of that first cycle; nothing else uses them.
+(`model.ipynb`) and its outputs (`model_outputs/`) have been removed from the folder; they remain in the git
+history (last present in commit `47b2787`) as the record of that first cycle.
 
 ---
 
@@ -482,8 +480,6 @@ probability.
    third decimal between machines.
 5. Run `python predict_poi.py --check` to confirm the tool matches the notebook.
 
-(`model.ipynb`, iteration 1, is not needed for steps 4 and 5.)
-
 Environment used: Python 3.14, pandas 3.0, NumPy 2.4, GeoPandas 1.1, SciPy 1.17, scikit-learn 1.9, matplotlib 3.10,
 PyTorch 2.14 (CPU) and PyTorch Geometric 2.8, pyproj for `predict_poi.py`.
 
@@ -503,7 +499,7 @@ outputs.
 |---|---|
 | OpenStreetMap (OSM) | A free world map built by volunteers. Anyone can add or edit, so how complete an area is depends on where mappers have worked. |
 | HOT, HDX | The Humanitarian OpenStreetMap Team, which produced the export, and the Humanitarian Data Exchange, where it is published. |
-| `oex` | The export tool HOT used (version 0.4.13). Its settings are in `config.yaml`. |
+| `oex` | The export tool HOT used (version 0.4.13). |
 | Snapshot | The date of the OSM database copy the export was taken from (2026-09-08). Later edits are not in the data. |
 | Feature | One mapped object in the raw export: one row of `points_of_interest.csv`. |
 | OSM element: node, way, relation | OSM's three object types. A **node** is a single point. A **way** is a line through several points, or an outline when it closes on itself. A **relation** groups other elements (here, 2 multi-part outlines). An OSM node is not the same thing as a graph node (D1, Data preparation). |
@@ -591,7 +587,7 @@ outputs.
 
 | Term | Meaning |
 |---|---|
-| Iteration 1, iteration 2 | The two design cycles of the model: `model.ipynb` (one mode, relies on mapping attributes) and `gnn_location_model.ipynb` (two modes). |
+| Iteration 1, iteration 2 | The two design cycles of the model: `model.ipynb` (one mode, relies on mapping attributes; retired) and `gnn_location_model.ipynb` (two modes). |
 | Known POI mode | The model sees all 66 features of a node, including how the node itself was mapped. Used for mapped POIs. |
 | Site mode | The node's own mapping attributes (the own-node columns) are hidden and the flag `own_attrs_hidden` is 1. The model sees only the location and its neighbourhood, as for a candidate site where no business stands yet. |
 | Own-node columns | The 10 features that describe how the node itself was mapped: the 8 `attr_` features, `ctx_osm_id_rank_vs_k32` and `ctx_footprint_vs_k32`. |
@@ -731,7 +727,7 @@ The tags each subcategory is built from (Stage 2.1). "Business" marks the subcat
 
 ### D4. Columns of `points_of_interest.csv`
 
-"Filled" is the share of the 12,536 rows with a value (from `metadata.json`).
+"Filled" is the share of the 12,536 rows with a value (from the export's column profile).
 
 | Column | Meaning | Filled |
 |---|---|---:|
