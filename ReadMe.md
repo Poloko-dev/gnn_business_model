@@ -1,7 +1,7 @@
 # Lesotho points of interest: data pipeline and GNN model
 
 This folder holds the OpenStreetMap points of interest (POIs) for Lesotho and the files derived from them for the
-GNN (graph neural network) business-location study, the GNN itself, and a command-line tool that applies it. Every
+GNN (graph neural network) business-location study, and the GNN itself. Every
 derived file comes from the one OSM export; no outside data are added at any stage. How the model is evaluated is in
 [Stage 5.3](#53-metrics). Terms, codes, categories and every column are explained in the [Dictionary](#dictionary)
 at the end.
@@ -20,7 +20,6 @@ poi_engineered.csv             6,083 nodes x 92 columns (66 model features)
         │  Stage 5: gnn_location_model.ipynb (dual-mode GraphSAGE, evaluation, ablations, RO2/RO3)
         ▼                (Stage 4, the first design, was retired; see git history)
 model_outputs_v2/              25 trained models, predictions in both modes, market gaps, metrics
-        │  Stage 6: predict_poi.py (score a candidate site, suggest sites, market gaps)
 ```
 
 ## Files
@@ -35,7 +34,6 @@ model_outputs_v2/              25 trained models, predictions in both modes, mar
 | `poi_engineered.csv` | Stage 3 output: the table the GNN is trained on |
 | `gnn_location_model.ipynb` | Model iteration 2: one GraphSAGE trained in two modes (known POI / candidate site), with architecture comparison, tuning, ablations, RO2 (what shapes an area) and RO3 (market gaps) |
 | `model_outputs_v2/` | Iteration 2 outputs: `gnn_dual_models.pt` (25 models), out-of-fold and unlabelled predictions in both modes, `market_gaps.csv`, `metrics.json`, training log |
-| `predict_poi.py` | Command-line tool on the iteration 2 model: `site`, `suggest`, `gaps`, `new`, `existing`, `batch`, and `--check` against the notebook (run `python predict_poi.py -h`) |
 
 ---
 
@@ -302,7 +300,7 @@ village 4 km away) and keeps a separate weight for the node itself.
 | **Macro-F1** (main metric) | F1 = 2·precision·recall / (precision + recall), computed per category and averaged with equal weight | The classes are unbalanced (Infrastructure is 9 times Healthcare); accuracy would reward ignoring the small classes. Chapter 1 specifies it | Selection (validation), headline result (test), ablations |
 | **Precision, recall, F1 per category** | Precision: share of the nodes predicted as *c* that are *c*. Recall: share of the *c* nodes predicted as *c* | Shows which categories the model can and cannot recognise; chapter 1 asks for per-class recall | Results (5.5) |
 | **Accuracy** | Share of nodes given the right category | Familiar summary; reported next to macro-F1, never instead of it | Results |
-| **Top-2 / top-3 accuracy** | Share of nodes whose true category is among the model's 2 or 3 most likely | The tool gives a ranked shortlist, so a correct second or third choice is still useful | Results, per category |
+| **Top-2 / top-3 accuracy** | Share of nodes whose true category is among the model's 2 or 3 most likely | The model gives a ranked shortlist, so a correct second or third choice is still useful | Results, per category |
 | **Log loss** | Mean of −ln(probability given to the true category) | Measures the quality of the whole probability vector, not just the top class. Far less noisy than macro-F1 | Temperature fitting, permutation importance (RO2) |
 | **Expected calibration error (ECE)** | Nodes are binned by their top probability (15 bins). ECE is the weighted mean gap between each bin's average probability and its accuracy | RO3 sums probabilities into expected counts, which is only valid if they are calibrated | Results, RO3 |
 | **Fold SD** | Standard deviation of the 5 held-out folds' scores | Shows how much performance varies between areas; differences smaller than about one SD are treated as noise | Every table |
@@ -431,44 +429,6 @@ profitability. It is the input to the interviews with business owners (RO4).
 
 ---
 
-## Stage 6: the location-intelligence tool (`predict_poi.py`)
-
-A command-line tool on the Stage 5 model. Run it with no arguments for an interactive menu.
-
-| Command | What it does | Time |
-|---|---|---|
-| `site --lat -29.3142 --lon 27.4833` | What a candidate location suits (site mode), with the market signals of its sub-district | about 1 s |
-| `suggest --category Retail --lat -30.4005 --lon 27.7013 --radius-km 1.5` | Scores a grid of up to about 49 candidate sites (points more than 1.5 km from any mapped POI are skipped) around a location and ranks them for one category, with the number of that category already within 1 km | about 1 s per site |
-| `gaps --area Quthing` (`--all` for unflagged rows) | The `market_gaps.csv` rows of the sub-districts or districts matching a name or code | instant |
-| `new --lat ... --lon ... --name --hours --footprint-m2 120` | A POI described as it would be mapped (known mode) | about 5 s |
-| `existing --query node/4340647091` | The notebook's out-of-fold predictions for a mapped POI, both modes | instant |
-| `batch sites.csv [--known]` | Every row of a CSV (`lat`, `lon`; optional `adm2_pcode`, or the mapping attributes with `--known`) | as above, per row |
-| `--check` | Verifies the tool against the notebook (below) | about 8 min |
-
-**How a location is scored.** The location is added to the graph of the 6,083 POIs as one more node, and its 66
-features are computed with the code of Stages 2 and 3.
-- **Candidate site (site mode):** a **one-way node**. It receives messages from its k-NN partners but changes nothing
-  for the existing POIs, and only its own random-walk encoding is computed. Only its 2-hop neighbourhood is run
-  through the models.
-- **New POI (known mode):** fully inserted, and every affected feature is recomputed.
-
-In both cases all 25 models score it, each with its split's training categories visible, and their
-temperature-scaled probabilities are averaged. Label reuse is not applied (it changed test F1 by less than 0.004).
-Because training weights the small categories up, their probabilities run high: read the ranking, not the
-percentages, as odds. Every output shows each category's out-of-fold F1 and top-3 accuracy in that mode next to its
-probability.
-
-**`--check`** runs four tests:
-1. All 66 features of the 6,083 POIs are rebuilt and match `poi_engineered.csv` (largest difference 1e-6).
-2. Live predictions match the notebook's out-of-fold predictions: macro-F1 0.359 against 0.360 (known) and 0.255
-   against 0.255 (site), the same class for 98% and 96% of nodes.
-3. POIs removed and added back as new POIs get the same features and probabilities (differences below 1e-4).
-4. Spots of removed POIs scored as candidate sites agree with the notebook's site mode for about 90% of nodes, with
-   the same top-3 accuracy (73% against 70% on 30 nodes). The notebook's site-mode scores therefore hold for real
-   candidate sites.
-
----
-
 ## Reproducing the pipeline
 
 1. Stage 1: run the snippet above (only needed if `points_of_interest.csv` is missing).
@@ -478,10 +438,9 @@ probability.
    (architecture comparison 25 min, tuning 70 min, final ensemble 15 min, ablations 2 hours, RO2 and RO3 15 min);
    a terminal window follows `training_progress.log` while it runs. Seeds are fixed, but results can differ in the
    third decimal between machines.
-5. Run `python predict_poi.py --check` to confirm the tool matches the notebook.
 
 Environment used: Python 3.14, pandas 3.0, NumPy 2.4, GeoPandas 1.1, SciPy 1.17, scikit-learn 1.9, matplotlib 3.10,
-PyTorch 2.14 (CPU) and PyTorch Geometric 2.8, pyproj for `predict_poi.py`.
+PyTorch 2.14 (CPU) and PyTorch Geometric 2.8.
 
 ---
 
@@ -617,7 +576,7 @@ outputs.
 | Local features | Features computed without any other POI: coordinates, district indicators and the node's own attributes (20 columns). Used to test whether message passing can learn the neighbourhood by itself. |
 | Permutation importance | The rise in log loss (or drop in macro-F1) when one feature's values are shuffled across nodes, breaking its link with the category. |
 | Occlusion | Hiding one input (here, the categories of all POIs of one type) and measuring how the predictions change. |
-| Deployment condition | The setting in which the tool is used: every mapped POI's category is known and visible as a neighbour category. |
+| Deployment condition | The setting in which the model is used: every mapped POI's category is known and visible as a neighbour category. |
 | Expected and observed count | For a sub-district and category: the sum of the nodes' corrected site-mode probabilities, and the number of nodes mapped with that category. |
 | Prior correction | One factor per category, fitted by iterative proportional fitting, that rescales the probabilities so that the national expected totals equal the observed totals. It removes the effect of the class weights before counting. |
 | z-score | (expected − observed) / √Σ p(1 − p): how many standard deviations the gap lies from zero, if the probabilities are calibrated. |
@@ -867,7 +826,7 @@ training folds of every split, so its probabilities are averaged over the 5 spli
 
 ### D9. Columns of `model_outputs_v2/market_gaps.csv`
 
-One row per sub-district and category (78 × 8 = 624 rows). Read by `predict_poi.py gaps` and `site`.
+One row per sub-district and category (78 × 8 = 624 rows).
 
 | Column | Meaning |
 |---|---|
